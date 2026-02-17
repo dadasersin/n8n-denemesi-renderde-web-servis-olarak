@@ -10,16 +10,8 @@ export const AIAssistant: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // API Key'i güvenli bir şekilde kontrol ediyoruz
-  const getApiKey = () => {
-    try {
-      return process.env.API_KEY;
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const apiKey = getApiKey();
+  // API Key kontrolü
+  const apiKey = process.env.API_KEY;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -30,11 +22,11 @@ export const AIAssistant: React.FC = () => {
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
-    if (!apiKey) {
+    if (!apiKey || apiKey === "") {
       setMessages(prev => [
         ...prev, 
         { role: 'user', text: input.trim() },
-        { role: 'ai', text: '⚠️ API_KEY tanımlı değil! Render panelinde Settings > Environment Variables kısmına giderek API_KEY eklediğinizden ve Build Command olarak "npm run build" kullandığınızdan emin olun.' }
+        { role: 'ai', text: '⚠️ API_KEY bulunamadı! Render panelinde "Environment" sekmesine giderek API_KEY eklediğinizden emin olun.' }
       ]);
       setInput('');
       return;
@@ -55,15 +47,12 @@ export const AIAssistant: React.FC = () => {
         }
       });
 
-      setMessages(prev => [...prev, { role: 'ai', text: response.text || "Üzgünüm, yanıt alınamadı." }]);
+      setMessages(prev => [...prev, { role: 'ai', text: response.text || "Yanıt oluşturulamadı." }]);
     } catch (error: any) {
-      console.error("AI Assistant Error:", error);
-      let errorMsg = "Bağlantı sırasında bir hata oluştu.";
-      if (error?.message?.includes('API key not valid')) {
-        errorMsg = "Sağlanan API anahtarı geçersiz. Lütfen anahtarı kontrol edin.";
-      }
-      setMessages(prev => [...prev, { role: 'ai', text: errorMsg }]);
+      console.error("AI Error:", error);
+      setMessages(prev => [...prev, { role: 'ai', text: "Hata: " + (error.message || "Bilinmeyen bir hata oluştu.") }]);
     } finally {
+      setLoading(true); // Küçük bir gecikme için
       setLoading(false);
     }
   };
@@ -76,7 +65,7 @@ export const AIAssistant: React.FC = () => {
           Gemini n8n Asistanı
         </div>
         {!apiKey && (
-          <span className="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold uppercase tracking-tighter">API KEY EKSİK</span>
+          <span className="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold">API KEY EKSİK</span>
         )}
       </div>
 
@@ -93,13 +82,9 @@ export const AIAssistant: React.FC = () => {
           </div>
         ))}
         {loading && (
-          <div className="flex justify-start">
-            <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none shadow-sm">
-              <div className="flex gap-1">
-                <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce"></div>
-                <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce delay-100"></div>
-                <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce delay-200"></div>
-              </div>
+          <div className="flex justify-start animate-pulse">
+            <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none shadow-sm text-slate-400 text-xs">
+              Düşünüyor...
             </div>
           </div>
         )}
@@ -110,7 +95,7 @@ export const AIAssistant: React.FC = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder={apiKey ? "Sorunuzu buraya yazın..." : "Lütfen API anahtarını ekleyip build alın..."}
+          placeholder="Sorunuzu yazın..."
           className="flex-1 px-4 py-2 bg-slate-100 border-transparent rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
         />
         <button 
