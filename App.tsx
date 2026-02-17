@@ -7,14 +7,14 @@ import { CodeBlock } from './components/CodeBlock';
 const App: React.FC = () => {
   const [errorInput, setErrorInput] = useState<string>(
     `==> https://github.com/dadasersin/n8n-denemesi adresinden klonlanıyor 
-==> main dalındaki 916e27069ea36f58ce32d1ef764e2feac0f51b3c commit'ini kontrol ediliyor. 
+==> main dalındaki 2aaefeb5bb5f3d6b7b820726a2c6d8f7483bece3 commit'ini kontrol ediliyor. 
+Menu
 #1 [dahili] Dockerfile'dan derleme tanımını yükle
 #1 Dockerfile aktarımı: 2B tamamlandı
 #1 TAMAMLANDI 0.0s
-Hata: Çözümlenemedi: Dockerfile okunamadı: Dockerfile açılamadı: Böyle bir dosya veya dizin yok
-hata: çıkış durumu 1`
+Hata: Çözümlenemedi: Dockerfile okunamadı: Dockerfile açılamadı: Böyle bir dosya veya dizin yok`
   );
-  const [contextInput, setContextInput] = useState<string>('n8n deployment trial (n8n-denemesi) on a Linux/Docker environment');
+  const [contextInput, setContextInput] = useState<string>('Render.com or similar cloud platform deployment for n8n-denemesi');
   const [status, setStatus] = useState<Status>(Status.IDLE);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -49,7 +49,7 @@ hata: çıkış durumu 1`
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight text-white leading-tight">DockerConfig AI</h1>
-              <p className="text-[10px] uppercase tracking-widest text-indigo-400 font-black">n8n Specialist</p>
+              <p className="text-[10px] uppercase tracking-widest text-indigo-400 font-black">Render Deployment Specialist</p>
             </div>
           </div>
           <div className="flex items-center gap-6">
@@ -73,30 +73,30 @@ hata: çıkış durumu 1`
 
               <h2 className="text-sm font-bold text-slate-400 mb-8 uppercase tracking-[0.2em] flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
-                Terminal Input
+                Deployment Log
               </h2>
 
               <div className="space-y-6">
                 <div>
                   <div className="flex justify-between items-center mb-2 px-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Error Stream</label>
-                    <span className="text-[10px] text-indigo-400/60 font-mono">STDOUT/STDERR</span>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Terminal Output</label>
+                    <span className="text-[10px] text-indigo-400/60 font-mono">ERROR DETECTED</span>
                   </div>
                   <textarea
                     value={errorInput}
                     onChange={(e) => setErrorInput(e.target.value)}
-                    placeholder="Paste logs from your deployment attempt..."
+                    placeholder="Paste logs from Render or other platforms..."
                     className="w-full h-72 bg-slate-950/80 border border-slate-800 rounded-2xl p-5 text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all mono text-sm leading-relaxed shadow-inner"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-wider px-1">System Environment</label>
+                  <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-wider px-1">Deployment Target</label>
                   <input
                     type="text"
                     value={contextInput}
                     onChange={(e) => setContextInput(e.target.value)}
-                    placeholder="e.g. AWS EC2, Portainer, n8n manual setup..."
+                    placeholder="e.g. Render, Railway, Vercel, DigitalOcean..."
                     className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-4 text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm shadow-inner"
                   />
                 </div>
@@ -116,30 +116,32 @@ hata: çıkış durumu 1`
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <span>Generating Solution...</span>
+                      <span>Diagnosing Build...</span>
                     </>
                   ) : (
                     <>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                       </svg>
-                      <span>Analyze Error</span>
+                      <span>Fix Deployment</span>
                     </>
                   )}
                 </button>
               </div>
             </div>
 
-            {/* Quick Insights */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                <div className="text-emerald-500 text-xs font-bold mb-1">Status</div>
-                <div className="text-white text-sm font-medium">Ready for Input</div>
+            <div className="p-6 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="text-xs font-black uppercase tracking-widest text-indigo-300">Quick Debug Tip</span>
               </div>
-              <div className="p-5 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
-                <div className="text-amber-500 text-xs font-bold mb-1">Model</div>
-                <div className="text-white text-sm font-medium">Flash Thinking</div>
-              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Render typically requires a <code className="text-indigo-400 font-mono">Dockerfile</code> to build a custom container. If you're seeing "no such file or directory", the platform can't find your instructions in the root of the repository.
+              </p>
             </div>
           </div>
 
@@ -152,8 +154,8 @@ hata: çıkış durumu 1`
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-slate-400">System Standby</h3>
-                <p className="text-slate-500 mt-3 max-w-sm leading-relaxed">Provide your deployment logs. We'll identify the root cause and generate ready-to-use configuration patches.</p>
+                <h3 className="text-xl font-bold text-slate-400">Ready to Fix Build</h3>
+                <p className="text-slate-500 mt-3 max-w-sm leading-relaxed">Paste your Render/Docker error logs. We'll generate the missing Dockerfile and explain why the build failed.</p>
               </div>
             )}
 
@@ -169,7 +171,7 @@ hata: çıkış durumu 1`
                     <h3 className="font-black text-xl uppercase tracking-wider">Analysis Failed</h3>
                     <p className="mt-2 text-slate-400 leading-relaxed">{errorMessage}</p>
                     <button onClick={handleAnalyze} className="mt-8 px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-600/20">
-                      Re-run Diagnostics
+                      Try Again
                     </button>
                   </div>
                 </div>
@@ -184,16 +186,16 @@ hata: çıkış durumu 1`
                     <div className="flex items-center justify-between mb-10">
                       <div className="flex items-center gap-3 text-indigo-400 uppercase tracking-[0.3em] text-[10px] font-black">
                         <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>
-                        Executive Summary
+                        Render Build Analysis
                       </div>
                       <div className="text-[10px] font-mono text-slate-600 bg-slate-950 px-3 py-1 rounded-full">
-                        REF: {Math.random().toString(36).substr(2, 9).toUpperCase()}
+                        BUILD_FAIL_FIX_V2
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                       <div>
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Root Cause</h3>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Why is this failing?</h3>
                         <div className="bg-slate-950/40 p-6 rounded-2xl border border-slate-800/50 shadow-inner">
                           <p className="text-slate-300 leading-relaxed text-sm">
                             {result.explanation}
@@ -202,7 +204,7 @@ hata: çıkış durumu 1`
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Resolution Path</h3>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Fix Instructions</h3>
                         <div className="bg-indigo-500/5 p-6 rounded-2xl border border-indigo-500/10 shadow-inner">
                           <div className="prose prose-invert prose-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
                             {result.solution}
@@ -219,9 +221,9 @@ hata: çıkış durumu 1`
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        Generated Patches
+                        Missing Configuration
                       </h3>
-                      <span className="text-[10px] text-slate-600 font-mono">X86_64 / ARM64 COMPATIBLE</span>
+                      <span className="text-[10px] text-slate-600 font-mono uppercase">Add these to your repo</span>
                     </div>
                     
                     <div className="space-y-6">
@@ -238,13 +240,6 @@ hata: çıkış durumu 1`
                         </div>
                       ))}
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center">
-                  <div className="flex items-center gap-3 px-6 py-2 bg-slate-900/50 border border-slate-800 rounded-full">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Build Logic Verified</span>
                   </div>
                 </div>
               </div>
@@ -264,7 +259,7 @@ hata: çıkış durumu 1`
               <span className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Deployment Diagnostics</span>
             </div>
             <p className="text-xs text-slate-600 font-medium max-w-xs leading-relaxed">
-              Automated container orchestration assistant. Optimized for n8n self-hosting workflows.
+              Automated container orchestration assistant. Optimized for n8n self-hosting on platforms like Render.
             </p>
           </div>
           

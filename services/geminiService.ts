@@ -11,7 +11,7 @@ export const analyzeDockerError = async (errorText: string, context: string = ''
     Analyze the following Docker build error and provide a detailed explanation, a solution, and the necessary configuration files (Dockerfile, docker-compose.yml, etc.).
     
     User Context:
-    The user is likely attempting to deploy n8n (specifically via a project named 'n8n-denemesi').
+    The user is deploying n8n (project: 'n8n-denemesi') and likely using a cloud platform like Render.com.
     
     Error Message: 
     ${errorText}
@@ -20,15 +20,15 @@ export const analyzeDockerError = async (errorText: string, context: string = ''
     ${context}
 
     CRITICAL ANALYSIS REQUIREMENTS:
-    1. The error "Hata: Çözümlenemedi: Dockerfile okunamadı" indicates that the Docker build process is looking for a file named 'Dockerfile' in the root of the repository, but it's missing or named differently.
-    2. If the user is trying to deploy n8n from a clone, advise them that the official way to run n8n is usually via an official Docker image (n8nio/n8n) in a docker-compose.yml file, rather than trying to build it from source unless they have custom nodes.
-    3. LANGUAGE: Since the error logs are in Turkish, respond with the 'explanation' and 'solution' in TURKISH.
-    4. Provide a 'docker-compose.yml' that follows n8n best practices (including persistence volumes and environment variables like N8N_HOST).
-    5. Provide a simple 'Dockerfile' if building from source is indeed required for their context.
+    1. The error "Hata: Çözümlenemedi: Dockerfile okunamadı" explicitly means the platform (Render, etc.) is trying to find a "Dockerfile" in the root of the repository to build the container, but it is missing.
+    2. Explain in TURKISH why this happens on "Render" specifically (Render needs a Dockerfile for 'Web Service' types if it's a Docker build).
+    3. LANGUAGE: Respond with the 'explanation' and 'solution' in TURKISH.
+    4. Provide a standard, robust 'Dockerfile' for n8n that uses the official image.
+    5. Provide a 'render.yaml' if applicable or a standard 'docker-compose.yml' for reference.
     
     Response Format (JSON):
-    - explanation: (Turkish) Explain precisely why Docker failed (the missing file).
-    - solution: (Turkish) Step-by-step fix (e.g., 'Ensure you are in the correct directory', 'Use the official image instead of building', 'Create a Dockerfile').
+    - explanation: (Turkish) Explain precisely that the build failed because the repo lacks a Dockerfile, causing Render to fail the build process.
+    - solution: (Turkish) Step-by-step fix: Create the Dockerfile, add it to git, push to main, and Render will restart the build.
     - files: Array of generated files with name, language, and content.
   `;
 
