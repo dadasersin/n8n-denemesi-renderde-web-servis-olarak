@@ -1,0 +1,17 @@
+# En güncel n8n sürümünü kullanıyoruz
+FROM n8nio/n8n:latest
+
+# Sistem araçlarını ve Python'u yüklemek için root yetkisi alıyoruz
+USER root
+
+# N8N içinde Python scriptleri ve terminal komutları çalıştırmak için gerekli paketler
+RUN apk update && \
+    apk add --no-cache curl python3 py3-pip bash && \
+    rm -rf /var/cache/apk/*
+
+# Güvenlik için tekrar standart kullanıcıya dönüyoruz
+USER node
+
+# Render'ın port ayarı
+ENV PORT=5678
+EXPOSE 5678

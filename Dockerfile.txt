@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: n8n-ozel-platform
+    env: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /healthz
+    envVars:
+      - key: N8N_HOST
+        fromContext: instance_host
+      - key: N8N_PROTOCOL
+        value: https
+      - key: WEBHOOK_URL
+        value: https://${RENDER_EXTERNAL_HOSTNAME}/
+      - key: N8N_PORT
+        value: 5678
+      - key: N8N_ENCRYPTION_KEY
+        generateValue: true
+      - key: DB_TYPE
+        value: postgresdb
+      - key: DB_POSTGRESDB_DATABASE
+        fromDatabase:
+          name: n8n-veritabani
+          property: database
+      - key: DB_POSTGRESDB_HOST
+        fromDatabase:
+          name: n8n-veritabani
+          property: host
+      - key: DB_POSTGRESDB_PORT
+        fromDatabase:
+          name: n8n-veritabani
+          property: port
+      - key: DB_POSTGRESDB_USER
+        fromDatabase:
+          name: n8n-veritabani
+          property: user
+      - key: DB_POSTGRESDB_PASSWORD
+        fromDatabase:
+          name: n8n-veritabani
+          property: password
+      # Render Ücretsiz Plan Performans Ayarları
+      - key: EXECUTIONS_PROCESS
+        value: main
+      - key: N8N_METRICS
+        value: "true"
+
+databases:
+  - name: n8n-veritabani
+    plan: free
+    region: frankfurt
