@@ -5,11 +5,12 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   define: {
+    // Render'daki API_KEY'i global process.env'e enjekte eder
     'process.env.API_KEY': JSON.stringify(process.env.API_KEY || "")
   },
   build: {
-    // Render'ın hata verdiği 'build' klasörü sorununu çözmek için çıktı klasörünü build yapıyoruz
     outDir: 'build',
-    emptyOutDir: true
+    emptyOutDir: true,
+    sourcemap: false
   }
 });
