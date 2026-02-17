@@ -1,0 +1,5 @@
+{
+  "name": "DockerConfig AI",
+  "description": "An intelligent assistant for debugging Docker deployment errors and generating optimized Dockerfile/docker-compose configurations for n8n and other web applications.",
+  "requestFramePermissions": []
+}
