@@ -63,7 +63,7 @@ export const STEPS: Step[] = [
     fileName: "Dockerfile",
     code: DOCKERFILE_CONTENT,
     tips: [
-      "Hugging Face 7860 portunu bekler. EXPOSE ve --port değerlerinin 7860 olduğundan emin olun.",
+      "Hugging Face 7860 portunu bekler. EXPOSE and --port değerlerinin 7860 olduğundan emin olun.",
       "n8n verileri için /data klasörü oluşturulur ve izinleri ayarlanır."
     ]
   },
@@ -83,16 +83,15 @@ export const RENDER_STEPS: Step[] = [
   {
     id: 1,
     title: "Dosyaları GitHub'a Yükleyin",
-    description: "Tüm dosyaları (package.json dahil) GitHub deponuza gönderin.",
+    description: "Tüm dosyaları (server.js dahil) GitHub deponuza gönderin.",
     tips: [
-      "Kök dizinde package.json ve vite.config.ts olduğundan emin olun.",
-      "index.html dosyasının en altında script yolunun doğru olduğundan emin olun."
+      "Kök dizinde package.json, server.js ve vite.config.ts olmalı."
     ]
   },
   {
     id: 2,
-    title: "Render'da Yeni Static Site",
-    description: "Render panelinden 'New Static Site' seçeneğini seçin.",
+    title: "Render'da Yeni 'Web Service' Oluştur",
+    description: "Render panelinde 'New +' butonuna basınca 'Web Service' seçeneğini seçin.",
     tips: [
       "GitHub deponuzu Render'a bağlayın.",
       "Runtime olarak 'Node' seçildiğinden emin olun."
@@ -100,22 +99,22 @@ export const RENDER_STEPS: Step[] = [
   },
   {
     id: 3,
-    title: "Derleme (Build) Ayarları",
-    description: "Render'ın uygulamayı düzgünce kurması için bu ayarları girin:",
+    title: "Web Servisi Ayarları",
+    description: "Render'ın uygulamayı çalıştırması için bu ayarları girin:",
     tips: [
       "Build Command: npm install && npm run build",
-      "Publish Directory: dist",
-      "Bu ayarlar sayesinde .tsx dosyalarınız tarayıcının anlayacağı .js dosyalarına dönüşür."
+      "Start Command: npm start",
+      "Port: 10000 (Render varsayılanı, otomatik algılanır)"
     ]
   },
   {
     id: 4,
-    title: "API Anahtarını (Environment) Ekleyin",
+    title: "API Anahtarını Ekleyin",
     description: "Settings -> Environment Variables kısmına girin.",
     tips: [
       "Key: API_KEY",
-      "Value: Google AI Studio'dan aldığınız anahtar.",
-      "Bunu yapmazsanız AI Asistanı çalışmayacaktır."
+      "Value: Google AI Studio anahtarınız.",
+      "Bunu eklemezseniz Asistan sekmesi çalışmayacaktır."
     ]
   }
 ];

@@ -55,8 +55,31 @@ const App: React.FC = () => {
       <main className="max-w-4xl mx-auto px-4 mt-12">
         {activeTab === TabType.Guide && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Explain the Flow Section */}
+            <section className="mb-12 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+              <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-2">
+                <span className="text-blue-600">🚀</span> Bu Uygulama Nasıl Kullanılır?
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                <div className="relative z-10 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                  <div className="text-blue-600 font-bold mb-2">1. Adım: Bu Site</div>
+                  <p className="text-sm text-slate-600">Şu an buradasınız. Burası sizin <b>"Kontrol Merkeziniz"</b>. Buradaki Dockerfile ve README kodlarını kopyalayacaksınız.</p>
+                </div>
+                <div className="relative z-10 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                  <div className="text-blue-600 font-bold mb-2">2. Adım: Hugging Face</div>
+                  <p className="text-sm text-slate-600">Hugging Face'de bir <b>Space</b> açıp, bu siteden aldığınız kodları oraya yapıştıracaksınız.</p>
+                </div>
+                <div className="relative z-10 bg-blue-600 p-5 rounded-2xl text-white shadow-lg">
+                  <div className="font-bold mb-2">3. Adım: n8n Çalışıyor!</div>
+                  <p className="text-sm text-blue-50">Hugging Face size bir URL verecek. n8n artık orada (16GB RAM ile) çalışıyor olacak!</p>
+                </div>
+                {/* Connector Line for desktop */}
+                <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -z-0"></div>
+              </div>
+            </section>
+
             <section className="mb-10 text-center sm:text-left">
-              <h2 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">Hugging Face'de n8n Gücü</h2>
+              <h2 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">Hugging Face'de n8n Kurulumu</h2>
               <p className="text-lg text-slate-600 max-w-2xl leading-relaxed">
                 Render'dan daha fazla RAM (16GB) ve daha az kısıtlama. Adım adım kurulum rehberiniz.
               </p>
@@ -87,7 +110,7 @@ const App: React.FC = () => {
               </h4>
               <p className="text-amber-700 text-sm leading-relaxed">
                 Hugging Face Spaces "stateless" yapıdadır. Space yeniden başladığında n8n senaryolarınız silinebilir. 
-                <strong>Çözüm:</strong> n8n içinden senaryolarınızı düzenli yedekleyin veya Settings kısmından harici bir PostgreSQL (Supabase vb.) bağlayın.
+                <strong> Çözüm:</strong> n8n içinden senaryolarınızı düzenli yedekleyin veya Settings kısmından harici bir PostgreSQL (Supabase vb.) bağlayın.
               </p>
             </div>
           </div>
@@ -97,7 +120,7 @@ const App: React.FC = () => {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
             <section className="mb-6">
               <h2 className="text-3xl font-black text-slate-900 mb-2">Hazır n8n Akışları</h2>
-              <p className="text-slate-600 italic">Kopyalayıp n8n panelinize yapıştırarak anında kullanmaya başlayın.</p>
+              <p className="text-slate-600 italic">Bu JSON kodlarını kopyalayın ve <b>Hugging Face üzerinde çalışan n8n panelinize</b> yapıştırın.</p>
             </section>
             
             {WORKFLOWS.map((workflow, idx) => (
