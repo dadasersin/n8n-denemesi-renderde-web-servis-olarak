@@ -10,23 +10,26 @@ export const analyzeDockerError = async (errorText: string, context: string = ''
   const prompt = `
     Analyze the following Docker build error and provide a detailed explanation, a solution, and the necessary configuration files (Dockerfile, docker-compose.yml, etc.).
     
-    The user might be deploying n8n or a similar Node.js application based on the context.
+    User Context:
+    The user is likely attempting to deploy n8n (specifically via a project named 'n8n-denemesi').
     
     Error Message: 
     ${errorText}
     
-    Context:
+    Context Details:
     ${context}
 
-    IMPORTANT INSTRUCTIONS:
-    1. If the error is in Turkish (e.g., 'Böyle bir dosya veya dizin yok'), provide the explanation and solution in Turkish, as the user clearly prefers it.
-    2. Focus on n8n-specific deployment issues if mentioned.
-    3. The error "Dockerfile: no such file or directory" usually means the build context is wrong or the file is missing from the repository. Check if the user is trying to build a repo that expects a Dockerfile but it's not in the expected root path.
+    CRITICAL ANALYSIS REQUIREMENTS:
+    1. The error "Hata: Çözümlenemedi: Dockerfile okunamadı" indicates that the Docker build process is looking for a file named 'Dockerfile' in the root of the repository, but it's missing or named differently.
+    2. If the user is trying to deploy n8n from a clone, advise them that the official way to run n8n is usually via an official Docker image (n8nio/n8n) in a docker-compose.yml file, rather than trying to build it from source unless they have custom nodes.
+    3. LANGUAGE: Since the error logs are in Turkish, respond with the 'explanation' and 'solution' in TURKISH.
+    4. Provide a 'docker-compose.yml' that follows n8n best practices (including persistence volumes and environment variables like N8N_HOST).
+    5. Provide a simple 'Dockerfile' if building from source is indeed required for their context.
     
-    Please provide the response in a structured JSON format with the following keys:
-    - explanation: A clear human-readable explanation of why this error occurred.
-    - solution: Step-by-step instructions to fix it.
-    - files: An array of objects, each with 'name', 'language', and 'content'.
+    Response Format (JSON):
+    - explanation: (Turkish) Explain precisely why Docker failed (the missing file).
+    - solution: (Turkish) Step-by-step fix (e.g., 'Ensure you are in the correct directory', 'Use the official image instead of building', 'Create a Dockerfile').
+    - files: Array of generated files with name, language, and content.
   `;
 
   const response = await ai.models.generateContent({
