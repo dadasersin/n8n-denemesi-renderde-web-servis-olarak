@@ -6,7 +6,7 @@ import { StepCard } from './components/StepCard';
 import { AIAssistant } from './components/AIAssistant';
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabType>(TabType.Render); // Hata çözümü için varsayılan sekme yapıldı
+  const [activeTab, setActiveTab] = useState<TabType>(TabType.Render);
   const [copiedWorkflow, setCopiedWorkflow] = useState<string | null>(null);
 
   const copyToClipboard = (text: string, id: string) => {
@@ -22,17 +22,17 @@ const App: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-br from-red-600 to-orange-600 p-2 rounded-xl text-white font-bold text-xl shadow-lg animate-pulse">!</div>
             <div>
-              <h1 className="font-bold text-slate-800 tracking-tight leading-tight uppercase">Acil Çözüm Merkezi</h1>
-              <p className="text-[10px] text-red-500 uppercase font-bold tracking-widest">Render Hatası Giderme</p>
+              <h1 className="font-bold text-slate-800 tracking-tight leading-tight uppercase">Render Fixer</h1>
+              <p className="text-[10px] text-red-500 uppercase font-bold tracking-widest leading-none">Status: Critical Action Required</p>
             </div>
           </div>
           
           <nav className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
             {[
-              { id: TabType.Render, label: "⚠️ RENDER'I DÜZELT" },
+              { id: TabType.Render, label: "🚨 RENDER'I KURTAR" },
               { id: TabType.Guide, label: 'HF n8n Kurulumu' },
-              { id: TabType.Workflows, label: 'Akışlar' },
-              { id: TabType.AIAssistant, label: 'Asistan' }
+              { id: TabType.Workflows, label: 'Hazır Akışlar' },
+              { id: TabType.AIAssistant, label: 'Yapay Zeka Sor-Cevap' }
             ].map((tab) => (
               <button 
                 key={tab.id}
@@ -53,55 +53,74 @@ const App: React.FC = () => {
       <main className="max-w-4xl mx-auto px-4 mt-12">
         {activeTab === TabType.Render && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* HATA ANALİZİ PANELİ */}
-            <div className="bg-red-700 text-white p-10 rounded-[2.5rem] mb-12 shadow-2xl border-4 border-red-400">
-              <h2 className="text-4xl font-black mb-6 flex items-center gap-3">
-                🛑 HATANIZIN %100 ÇÖZÜMÜ
+            {/* PROGRESS UPDATE */}
+            <div className="bg-green-600 text-white p-6 rounded-t-[2rem] flex items-center gap-4 border-b border-green-500">
+              <div className="bg-white text-green-600 rounded-full p-1 shadow-inner">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+              </div>
+              <p className="font-black text-lg">YOLUN YARISINDASINIZ! Dockerfile Silindi ✅</p>
+            </div>
+
+            {/* THE FINAL OBSTACLE */}
+            <div className="bg-white border-x-4 border-b-4 border-red-600 rounded-b-[2.5rem] p-10 shadow-2xl mb-12">
+              <h2 className="text-3xl font-black mb-6 text-slate-900 leading-tight">
+                Şu anki hatanız: <span className="text-red-600">"Dockerfile okunamadı"</span>
               </h2>
-              <div className="space-y-6 text-lg">
-                <p className="font-bold bg-white/20 p-4 rounded-xl">
-                  Loglarınızdaki <code className="bg-black px-2">EINVALIDTAGNAME "&&"</code> hatası, Render'ın projenizi yanlışlıkla "Docker" olarak kurmaya çalışmasından kaynaklanıyor.
-                </p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-                  <div className="bg-white p-6 rounded-2xl text-slate-900 shadow-xl">
-                    <h4 className="font-black text-red-600 text-xl mb-4 border-b-2 border-red-100 pb-2">ADIM 1: GITHUB</h4>
-                    <p className="text-sm font-semibold mb-4 text-slate-600 uppercase tracking-tighter">Hemen Yapın:</p>
-                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                      <p className="font-black text-red-700">Dockerfile DOSYASINI SİLİN!</p>
-                      <p className="text-xs text-red-600 mt-2 italic">Not: Bu dosya sadece Hugging Face içindir. Render'daki GitHub deponuzda ASLA olmamalıdır.</p>
+              <p className="text-lg text-slate-600 mb-8 font-medium">
+                Harika! Dosyayı sildiğiniz için Render artık projenin ne olduğunu şaşırdı. 
+                Hala "Docker modunda" olduğu için Dockerfile arıyor ama bulamıyor. 
+                <b>Şimdi Render'a bunun bir Node.js projesi olduğunu söyleme zamanı:</b>
+              </p>
+              
+              <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-inner mb-8 ring-8 ring-slate-100">
+                <h4 className="text-red-400 font-black text-center text-xl mb-6 uppercase tracking-widest">SON ADIM: RENDER AYARLARINI DEĞİŞTİRİN</h4>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-black text-2xl shadow-lg">1</div>
+                    <div className="flex-1">
+                      <p className="text-slate-400 text-xs font-bold uppercase">Runtime Seçimi</p>
+                      <p className="font-black text-xl">Settings &gt; Runtime: <span className="text-blue-400 underline decoration-2">Node</span></p>
                     </div>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl text-slate-900 shadow-xl">
-                    <h4 className="font-black text-blue-600 text-xl mb-4 border-b-2 border-blue-100 pb-2">ADIM 2: RENDER AYARI</h4>
-                    <p className="text-sm font-semibold mb-4 text-slate-600 uppercase tracking-tighter">Settings sekmesinde:</p>
-                    <ul className="text-sm space-y-3 font-bold">
-                      <li className="flex items-center gap-2"><span className="text-green-500">✔</span> Runtime: <span className="text-blue-600">Node</span></li>
-                      <li className="flex items-center gap-2"><span className="text-green-500">✔</span> Build: <span className="text-blue-600">npm install && npm run build</span></li>
-                      <li className="flex items-center gap-2"><span className="text-green-500">✔</span> Start: <span className="text-blue-600">npm start</span></li>
-                      <li className="flex items-center gap-2 text-red-600"><span className="text-red-500">✘</span> Docker Command: <span className="bg-slate-100 px-2">BOŞ BIRAKIN</span></li>
-                    </ul>
+                  <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-black text-2xl shadow-lg">2</div>
+                    <div className="flex-1">
+                      <p className="text-slate-400 text-xs font-bold uppercase">Yükleme Komutu</p>
+                      <p className="font-black text-xl">Build Command: <span className="text-green-400 font-mono">npm install && npm run build</span></p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-black text-2xl shadow-lg">3</div>
+                    <div className="flex-1">
+                      <p className="text-slate-400 text-xs font-bold uppercase">Başlatma Komutu</p>
+                      <p className="font-black text-xl">Start Command: <span className="text-green-400 font-mono">npm start</span></p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-10 bg-yellow-400 text-black p-6 rounded-2xl text-center font-black text-xl shadow-lg transform -rotate-1">
-                BU İKİ ADIMI YAPTIĞINIZDA SİTE AÇILACAKTIR!
+              <div className="text-center">
+                <p className="text-slate-500 font-bold mb-4 italic">Ayarları kaydedip "Manual Deploy" butonuna bastığınızda siteniz yayına girecek.</p>
+                <div className="inline-block bg-red-100 text-red-700 px-6 py-3 rounded-full font-black animate-bounce">
+                  ⚠️ DOCKER COMMAND KUTUSUNU TAMAMEN BOŞALTIN!
+                </div>
               </div>
             </div>
-            
-            <div className="bg-white p-8 rounded-3xl border border-slate-200">
-              <h3 className="text-2xl font-black mb-6 text-slate-800">Neden Hata Alıyorsunuz?</h3>
-              <div className="prose prose-slate max-w-none text-slate-600">
-                <p>
-                  Render, projenin kök dizininde bir <code>Dockerfile</code> gördüğü an otomatik olarak <b>Docker Runtime</b>'a geçer. 
-                  Docker modunda "Build Command" diye bir şey yoktur, sadece "Docker Command" vardır. Siz oraya Terminal komutu yazınca 
-                  Render bunu Docker imajı sanıp hata verir. 
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+              <div className="bg-blue-600 text-white p-6 rounded-3xl shadow-lg">
+                <h4 className="font-black mb-2">Peki neden?</h4>
+                <p className="text-sm opacity-90 leading-relaxed">
+                  Render projenizi "Docker" olarak mimlemişti. Dockerfile'ı sildiğinizde Render "Ben neyi çalıştıracağım?" diyor. Runtime'ı "Node" olarak değiştirdiğimizde Render artık Dockerfile'ı değil, package.json dosyasını baz alacaktır.
                 </p>
-                <div className="bg-blue-50 p-4 rounded-xl border-l-4 border-blue-500 mt-4">
-                  <b>Unutmayın:</b> Bu site bir <u>Rehberdir</u>. Önce bu siteyi kurun, sonra bu sitenin içindeki kodları kopyalayıp <u>Hugging Face'de</u> n8n kuracaksınız.
-                </div>
+              </div>
+              <div className="bg-slate-800 text-white p-6 rounded-3xl shadow-lg">
+                <h4 className="font-black mb-2">Başardığınızda:</h4>
+                <p className="text-sm opacity-90 leading-relaxed">
+                  Siteniz yayına girecek ve size n8n'i 16GB RAM ile nasıl bedava kuracağınızı anlatan dev bir rehber sunacak. n8n'i Render'da değil, Hugging Face'de kuracağız.
+                </p>
               </div>
             </div>
           </div>
@@ -112,7 +131,7 @@ const App: React.FC = () => {
             <section className="mb-10 text-center sm:text-left">
               <h2 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">Hugging Face n8n Kurulumu</h2>
               <p className="text-lg text-slate-600 max-w-2xl leading-relaxed">
-                Render'daki sorunu çözüp bu rehberi açtıktan sonra, aşağıdaki adımlarla 16GB RAM'li n8n'inizi kurun.
+                Render'daki sorunu çözdüğünüze göre, şimdi n8n kurulumuna başlayabiliriz.
               </p>
             </section>
             {STEPS.map(step => (
@@ -127,9 +146,9 @@ const App: React.FC = () => {
               <div key={idx} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-bold text-slate-800">{workflow.name}</h3>
-                  <button onClick={() => copyToClipboard(workflow.json, `wf-${idx}`)} className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold">JSON Kopyala</button>
+                  <button onClick={() => copyToClipboard(workflow.json, `wf-${idx}`)} className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold transition-transform active:scale-95">JSON Kopyala</button>
                 </div>
-                <p className="text-slate-600 text-sm">{workflow.description}</p>
+                <p className="text-slate-600 text-sm leading-relaxed">{workflow.description}</p>
               </div>
             ))}
           </div>
