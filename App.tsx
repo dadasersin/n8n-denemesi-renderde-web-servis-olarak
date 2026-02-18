@@ -89,21 +89,6 @@ const App: React.FC = () => {
               <StepCard key={step.id} step={step} />
             ))}
             
-            {/* Troubleshooting Alert */}
-            <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl mt-8 shadow-sm">
-              <h4 className="text-red-800 font-bold mb-2 flex items-center gap-2 text-lg">
-                🚨 'Configuration Error' mu Alıyorsunuz?
-              </h4>
-              <p className="text-red-700 text-sm leading-relaxed mb-4">
-                Hugging Face genellikle README.md dosyasındaki YAML başlığı eksik veya hatalı olduğunda bu hatayı verir.
-              </p>
-              <ul className="text-red-700 text-sm list-disc list-inside space-y-1">
-                <li><code>sdk: docker</code> yazdığından emin olun.</li>
-                <li><code>app_port: 7860</code> ayarının olduğundan emin olun.</li>
-                <li>YAML bloğunun en üstte ve <code>---</code> işaretleri arasında olduğundan emin olun.</li>
-              </ul>
-            </div>
-
             <div className="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-r-xl mt-4 shadow-sm">
               <h4 className="text-amber-800 font-bold mb-2 flex items-center gap-2 text-lg">
                 ⚠️ Veri Kaybı Riski
@@ -188,10 +173,29 @@ const App: React.FC = () => {
         {activeTab === TabType.Render && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <section className="mb-10 text-center sm:text-left">
-              <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Bu Uygulamayı Render'da Yayınlayın</h2>
-              <p className="text-lg text-slate-600 leading-relaxed">
-                Bu helper uygulamasını (şu an gördüğünüz siteyi) kendi Render hesabınızda host etmek için aşağıdaki adımları izleyin.
+              <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tight">Render'da "Web Service" Hata Giderme</h2>
+              <p className="text-lg text-slate-600 leading-relaxed mb-6">
+                Render'da <code>ENOENT: package.json not found</code> hatası alıyorsanız, aşağıdaki kritik adımları kontrol edin.
               </p>
+              
+              <div className="bg-red-50 border-l-4 border-red-600 p-6 rounded-r-2xl mb-8 shadow-sm">
+                <h4 className="text-red-800 font-bold mb-3 flex items-center gap-2 text-xl">
+                  🚨 ÇÖZÜM: Docker Dosyası Çakışması
+                </h4>
+                <p className="text-red-700 text-sm leading-relaxed mb-4">
+                  Render, projenin kök dizininde bir <code>Dockerfile</code> görürse, <code>package.json</code> dosyasını görmezden gelir ve projeyi bir Docker servisi olarak başlatmaya çalışır.
+                </p>
+                <div className="space-y-4">
+                  <div className="bg-white p-4 rounded-xl border border-red-100">
+                    <p className="font-bold text-red-800 text-sm mb-1">Ne Yapmalısınız?</p>
+                    <p className="text-xs text-red-600">Rehberdeki n8n için olan <code>Dockerfile</code> dosyasını GitHub deponuzun kök dizininden <b>silin</b> veya adını <code>n8n.Dockerfile</code> olarak değiştirin. Render'ın bu dosyayı "görmemesi" gerekiyor.</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl border border-red-100">
+                    <p className="font-bold text-red-800 text-sm mb-1">Render Ayarlarını Kontrol Edin</p>
+                    <p className="text-xs text-red-600">Settings kısmında "Runtime" seçeneğinin <b>Node</b> olduğundan emin olun. Docker seçili kalmış olabilir.</p>
+                  </div>
+                </div>
+              </div>
             </section>
             
             {RENDER_STEPS.map(step => (
@@ -199,10 +203,9 @@ const App: React.FC = () => {
             ))}
 
             <div className="bg-blue-900 text-white p-6 rounded-2xl shadow-lg mt-8">
-              <h4 className="font-bold mb-2 flex items-center gap-2">💡 Neden Render?</h4>
+              <h4 className="font-bold mb-2 flex items-center gap-2">💡 Tavsiye</h4>
               <p className="text-sm text-blue-100">
-                Bu uygulama tamamen istemci taraflı (Frontend) olduğu için Render'da "Static Site" olarak **ömür boyu ücretsiz** yayınlanabilir. 
-                Tek yapmanız gereken dosyaları GitHub'a yükleyip Render'a bağlamaktır.
+                Bu uygulama tamamen statik bir React uygulamasıdır. Eğer Node.js sunucusu (Web Service) ile uğraşmak istemiyorsanız, Render'da <b>"New > Static Site"</b> seçeneğini kullanarak sorunsuzca yayınlayabilirsiniz.
               </p>
             </div>
           </div>

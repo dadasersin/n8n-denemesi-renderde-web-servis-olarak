@@ -30,7 +30,7 @@ Bu Space, Docker altyapısı kullanılarak n8n çalıştırmak için yapılandı
 - **Port:** 7860 (Hugging Face varsayılanı)
 - **RAM:** 16GB (Ücretsiz plan)
 
-Eğer "Configuration Error" alıyorsanız, bu dosyanın (README.md) en üstündeki YAML bloğunun doğru olduğundan ve 'sdk: docker' yazdığından emin olun.`;
+Eğer "Configuration Error" alıyorsanız, bu dosyanın (README.md) en üstündeki YAML başlığı eksik veya hatalı olduğunda bu hatayı verir.`;
 
 export const STEPS: Step[] = [
   {
@@ -59,7 +59,7 @@ export const STEPS: Step[] = [
   {
     id: 3,
     title: "Dockerfile Dosyasını Oluştur",
-    description: "n8n'in nasıl kurulacağını ve çalıştırılacağını tarif eden dosyadır.",
+    description: "n8n'in nasıl kurulacağını ve çalıştırılacağını tarif eden dosyadır. (Bu dosyayı Hugging Face'e ekleyeceksiniz, Render'a değil!)",
     fileName: "Dockerfile",
     code: DOCKERFILE_CONTENT,
     tips: [
@@ -82,10 +82,11 @@ export const STEPS: Step[] = [
 export const RENDER_STEPS: Step[] = [
   {
     id: 1,
-    title: "Dosyaları GitHub'a Yükleyin",
-    description: "Tüm dosyaları (server.js dahil) GitHub deponuza gönderin.",
+    title: "Dosyaları GitHub'a Hazırlayın",
+    description: "Deponuzda package.json ve server.js olmalı. DOCKERFILE OLMAMALI.",
     tips: [
-      "Kök dizinde package.json, server.js ve vite.config.ts olmalı."
+      "Önemli: Eğer n8n için olan Dockerfile dosyasını deponuzda tutuyorsanız, Render bunu Node projesi sanmaz. Onu deponuzdan çıkarın.",
+      "Kök dizinde sadece bu siteye ait dosyalar kalsın."
     ]
   },
   {
@@ -94,7 +95,7 @@ export const RENDER_STEPS: Step[] = [
     description: "Render panelinde 'New +' butonuna basınca 'Web Service' seçeneğini seçin.",
     tips: [
       "GitHub deponuzu Render'a bağlayın.",
-      "Runtime olarak 'Node' seçildiğinden emin olun."
+      "Runtime: Mutlaka 'Node' seçin (Docker SEÇMEYİN)."
     ]
   },
   {
@@ -104,17 +105,7 @@ export const RENDER_STEPS: Step[] = [
     tips: [
       "Build Command: npm install && npm run build",
       "Start Command: npm start",
-      "Port: 10000 (Render varsayılanı, otomatik algılanır)"
-    ]
-  },
-  {
-    id: 4,
-    title: "API Anahtarını Ekleyin",
-    description: "Settings -> Environment Variables kısmına girin.",
-    tips: [
-      "Key: API_KEY",
-      "Value: Google AI Studio anahtarınız.",
-      "Bunu eklemezseniz Asistan sekmesi çalışmayacaktır."
+      "Environment Variables: API_KEY (Gemini için) eklemeyi unutmayın."
     ]
   }
 ];
