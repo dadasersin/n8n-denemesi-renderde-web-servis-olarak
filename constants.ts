@@ -55,7 +55,7 @@ export const STEPS: Step[] = [
     code: DOCKERFILE_CONTENT,
     tips: [
       "Bu dosya n8n'in Hugging Face'de çalışmasını sağlar.",
-      "ÖNEMLİ: Bu dosyayı Render'a yüklediğiniz GitHub deposunun ana dizininde TUTMAYIN, Render'ın kafası karışır."
+      "ÖNEMLİ: Bu dosyayı Render'a yüklediğiniz GitHub deposundan SİLMELİSİNİZ. Aksi halde Render projenizi n8n sanıp hata verir."
     ]
   }
 ];
@@ -63,30 +63,21 @@ export const STEPS: Step[] = [
 export const RENDER_STEPS: Step[] = [
   {
     id: 1,
-    title: "Render 'Runtime' Ayarı",
-    description: "Render panelinde 'Settings' kısmına gidin.",
+    title: "GitHub'dan Dockerfile'ı Silin!",
+    description: "Render'ın 'Invalid tag name' hatası vermesinin sebebi bu dosyanın deponuzda durmasıdır.",
     tips: [
-      "Runtime: 'Node' seçilmeli (DOCKER SEÇMEYİN).",
-      "Eğer Docker seçili kalırsa 'package.json not found' hatası alırsınız."
+      "Dockerfile dosyasını GitHub'dan silin.",
+      "Render panelinde Settings > Runtime kısmını 'Node' yapın."
     ]
   },
   {
     id: 2,
-    title: "Komutları Doğru Yerlere Yazın",
-    description: "Render 'Web Service' için şu iki alanı doldurun:",
+    title: "Komutları Doğru Alanlara Girin",
+    description: "Render 'Web Service' ayarlarında Build ve Start komutlarını girin.",
     tips: [
       "Build Command: npm install && npm run build",
       "Start Command: npm start",
-      "Bu komutları 'Docker Command' kısmına değil, kendi alanlarına yazmalısınız."
-    ]
-  },
-  {
-    id: 3,
-    title: "Environment Variables",
-    description: "Uygulamanın çalışması için API anahtarını ekleyin.",
-    tips: [
-      "Key: API_KEY",
-      "Value: Google AI Studio'dan aldığınız anahtar."
+      "Docker Command kısmını boş bırakın!"
     ]
   }
 ];
@@ -100,6 +91,6 @@ export const WORKFLOWS: Workflow[] = [
   {
     name: "YouTube Trend & Gemini Senaryo Yazarı",
     description: "Trend videoları bulur ve Gemini ile senaryolaştırır.",
-    json: `{ "nodes": [], "connections": {} }` // Sadeleştirildi
+    json: `{ "nodes": [], "connections": {} }`
   }
 ];
