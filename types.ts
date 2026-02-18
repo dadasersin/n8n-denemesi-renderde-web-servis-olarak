@@ -1,29 +1,19 @@
 
-export interface Step {
-  id: number;
-  title: string;
-  description: string;
-  code?: string;
-  fileName?: string;
-  tips?: string[];
+export interface AnalysisResult {
+  explanation: string;
+  solution: string;
+  files: GeneratedFile[];
 }
 
-export interface Variable {
-  key: string;
-  description: string;
-  placeholder: string;
-}
-
-export interface Workflow {
+export interface GeneratedFile {
   name: string;
-  description: string;
-  json: string;
+  language: string;
+  content: string;
 }
 
-export enum TabType {
-  Guide = 'guide',
-  Workflows = 'workflows',
-  Resources = 'resources',
-  Render = 'render',
-  AIAssistant = 'ai-assistant'
+export enum Status {
+  IDLE = 'IDLE',
+  LOADING = 'LOADING',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR'
 }

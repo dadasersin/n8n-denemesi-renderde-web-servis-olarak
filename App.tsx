@@ -1,167 +1,286 @@
 
-import React, { useState } from 'react';
-import { TabType } from './types';
-import { STEPS, VARIABLES, WORKFLOWS, RENDER_STEPS } from './constants';
-import { StepCard } from './components/StepCard';
-import { AIAssistant } from './components/AIAssistant';
+import React, { useState, useEffect } from 'react';
+import { analyzeDockerError } from './services/geminiService';
+import { AnalysisResult, Status } from './types';
+import { CodeBlock } from './components/CodeBlock';
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabType>(TabType.Render);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [errorInput, setErrorInput] = useState<string>(
+    `==> Cloning from https://github.com/dadasersin/n8n-denemesi
+Menu
+==> Checking out commit 4b1635e03395a700883ba1509a052899d3c80baa in branch main
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2B done
+#1 DONE 0.0s
+error: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory`
+  );
+  const [contextInput, setContextInput] = useState<string>('Cloud platform (Render/Railway) deployment for n8n-denemesi');
+  const [status, setStatus] = useState<Status>(Status.IDLE);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleAnalyze = async () => {
+    if (!errorInput.trim()) return;
+
+    setStatus(Status.LOADING);
+    setResult(null);
+    setErrorMessage(null);
+    try {
+      const data = await analyzeDockerError(errorInput, contextInput);
+      setResult(data);
+      setStatus(Status.SUCCESS);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMessage(err.message || 'Analysis failed. Check your API key or logs.');
+      setStatus(Status.ERROR);
+    }
   };
 
-  const dockerfileContent = `FROM node:20-slim
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-ENV PORT=10000
-EXPOSE 10000
-CMD ["node", "server.js"]`;
-
   return (
-    <div className="min-h-screen pb-20 bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-2 rounded-xl text-white font-bold text-xl shadow-lg">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+    <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-indigo-500/30 font-sans">
+      {/* Navigation */}
+      <nav className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50">
+        <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
             <div>
-              <h1 className="font-bold text-slate-800 tracking-tight leading-tight uppercase">Docker Deployer</h1>
-              <p className="text-[10px] text-blue-500 uppercase font-bold tracking-widest leading-none">Target: Render Fix & n8n</p>
+              <h1 className="text-lg font-bold tracking-tight text-white leading-tight">DockerConfig AI</h1>
+              <p className="text-[10px] uppercase tracking-widest text-indigo-400 font-black">Cloud Build Engine</p>
             </div>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Analysis Engine: Gemini 3 Flash
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-[1400px] mx-auto p-6 lg:p-10">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+          
+          {/* Left Column: Build Logs */}
+          <div className="xl:col-span-5 space-y-8">
+            <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                <svg className="w-32 h-32 text-indigo-500" fill="currentColor" viewBox="0 0 24 24"><path d="M13.983 11l2.357-2.357-1.414-1.414L12.569 9.57 10.212 7.213 8.798 8.627 11.155 10.984l-2.357 2.357 1.414 1.414 2.357-2.357 2.357 2.357 1.414-1.414L13.983 11z"/></svg>
+              </div>
+
+              <h2 className="text-sm font-bold text-slate-400 mb-8 uppercase tracking-[0.2em] flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
+                Cloud Build Logs
+              </h2>
+
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between items-center mb-2 px-1">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Terminal Trace</label>
+                    <span className="text-[10px] text-indigo-400/60 font-mono">STDOUT</span>
+                  </div>
+                  <textarea
+                    value={errorInput}
+                    onChange={(e) => setErrorInput(e.target.value)}
+                    placeholder="Paste deployment logs here..."
+                    className="w-full h-72 bg-slate-950/80 border border-slate-800 rounded-2xl p-5 text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all mono text-sm leading-relaxed shadow-inner"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-wider px-1">Environment Context</label>
+                  <input
+                    type="text"
+                    value={contextInput}
+                    onChange={(e) => setContextInput(e.target.value)}
+                    placeholder="e.g. Render Web Service, Github Actions..."
+                    className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-4 text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm shadow-inner"
+                  />
+                </div>
+
+                <button
+                  onClick={handleAnalyze}
+                  disabled={status === Status.LOADING}
+                  className={`w-full py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-4 transition-all transform active:scale-[0.97] group ${
+                    status === Status.LOADING
+                      ? 'bg-slate-800 cursor-not-allowed text-slate-500'
+                      : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_20px_40px_-15px_rgba(79,70,229,0.3)]'
+                  }`}
+                >
+                  {status === Status.LOADING ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Analyzing Trace...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                      </svg>
+                      <span>Diagnose & Patch</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-amber-500/20 rounded-lg text-amber-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="text-xs font-black uppercase tracking-widest text-amber-400">Diagnosis Focus</span>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                The current error indicates that the repository was cloned successfully, but the builder failed at the very first step: loading the <code className="text-indigo-400 font-mono">Dockerfile</code>. This is almost always a pathing or filename issue.
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column: Diagnostics Result */}
+          <div className="xl:col-span-7">
+            {status === Status.IDLE && (
+              <div className="h-full border-2 border-dashed border-slate-800 rounded-[2.5rem] flex flex-col items-center justify-center p-12 text-center bg-slate-900/10">
+                <div className="w-24 h-24 bg-slate-900/80 rounded-3xl flex items-center justify-center mb-8 shadow-inner border border-slate-800">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-slate-400">Awaiting Build Data</h3>
+                <p className="text-slate-500 mt-3 max-w-sm leading-relaxed">Provide build logs to start the AI-driven troubleshooting session. We support n8n, Node.js, and general Docker errors.</p>
+              </div>
+            )}
+
+            {status === Status.ERROR && (
+              <div className="p-10 bg-red-900/10 border border-red-900/30 rounded-[2.5rem] text-red-400 animate-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-start gap-5">
+                  <div className="p-3 bg-red-900/20 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-black text-xl uppercase tracking-wider">Engine Error</h3>
+                    <p className="mt-2 text-slate-400 leading-relaxed">{errorMessage}</p>
+                    <button onClick={handleAnalyze} className="mt-8 px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-600/20">
+                      Re-run Diagnostics
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {status === Status.SUCCESS && result && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-right-10 duration-700">
+                <div className="bg-slate-900/80 border border-slate-800 rounded-[2.5rem] overflow-hidden shadow-2xl backdrop-blur-md">
+                  <div className="p-10 border-b border-slate-800/50">
+                    <div className="flex items-center justify-between mb-10">
+                      <div className="flex items-center gap-3 text-indigo-400 uppercase tracking-[0.3em] text-[10px] font-black">
+                        <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>
+                        Incident Analysis
+                      </div>
+                      <div className="text-[10px] font-mono text-slate-600 bg-slate-950 px-4 py-1.5 rounded-full border border-slate-800">
+                        RESOLVED
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                      <div>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Observation</h3>
+                        <div className="bg-slate-950/40 p-6 rounded-2xl border border-slate-800/50 shadow-inner">
+                          <p className="text-slate-300 leading-relaxed text-sm">
+                            {result.explanation}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Remediation Path</h3>
+                        <div className="bg-indigo-500/5 p-6 rounded-2xl border border-indigo-500/10 shadow-inner">
+                          <div className="prose prose-invert prose-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                            {result.solution}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Generated Assets */}
+                  <div className="p-10 bg-slate-950/50">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Remediation Patch
+                      </h3>
+                      <span className="text-[10px] text-slate-600 font-mono uppercase tracking-widest">Git diff ready</span>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      {result.files.map((file, idx) => (
+                        <div key={idx} className="group relative">
+                          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-blue-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                          <div className="relative">
+                            <CodeBlock 
+                              filename={file.name} 
+                              language={file.language} 
+                              content={file.content} 
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="mt-24 border-t border-slate-900 bg-slate-950/50 py-16 px-6">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 opacity-60">
+              <div className="w-8 h-8 bg-slate-800 rounded flex items-center justify-center">
+                 <svg className="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+              </div>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">DevOps Intelligence</span>
+            </div>
+            <p className="text-xs text-slate-600 font-medium max-w-xs leading-relaxed">
+              Automated container orchestration support system. Specialized for n8n deployments on Render and other major cloud providers.
+            </p>
           </div>
           
-          <nav className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
-            {[
-              { id: TabType.Render, label: "🐳 DOCKER HATASINI ÇÖZ" },
-              { id: TabType.Guide, label: 'HF n8n Kurulumu' },
-              { id: TabType.Workflows, label: 'Akışlar' },
-              { id: TabType.AIAssistant, label: 'AI Asistan' }
-            ].map((tab) => (
-              <button 
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as TabType)}
-                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                  activeTab === tab.id 
-                  ? 'bg-blue-600 text-white shadow-md' 
-                  : 'text-slate-500 hover:bg-slate-100'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 mt-12">
-        {activeTab === TabType.Render && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white border-2 border-red-200 rounded-[2.5rem] overflow-hidden shadow-2xl mb-12">
-              <div className="bg-red-600 p-8 text-white">
-                <h2 className="text-3xl font-black mb-2 flex items-center gap-3 text-white">
-                  🚨 HATA: "file with no instructions"
-                </h2>
-                <p className="opacity-90 font-medium leading-relaxed">
-                  Render şu an deponuzdaki Dockerfile'ı okuyor ama içinde <b>"hiçbir talimat yok"</b> diyor. 
-                  Bunun sebebi dosya içine yanlışlıkla <code>>>></code> gibi geçersiz karakterler girmesidir.
-                </p>
-              </div>
-
-              <div className="p-8 space-y-8">
-                <div className="bg-blue-50 p-6 rounded-3xl border border-blue-100">
-                  <h3 className="font-black text-blue-800 mb-4 flex items-center gap-2">
-                    ✅ Çözüm: Dosyayı Aşağıdakiyle Güncelleyin
-                  </h3>
-                  <p className="text-sm text-slate-600 mb-4">
-                    GitHub deponuzdaki <b>Dockerfile</b> dosyasını açın (Edit mode), içindeki her şeyi silin ve sadece aşağıdaki kodu yapıştırın:
-                  </p>
-                  
-                  <div className="relative group">
-                    <button 
-                      onClick={() => copyToClipboard(dockerfileContent, 'dockerfile-code')}
-                      className="absolute right-4 top-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-lg active:scale-95 transition-all"
-                    >
-                      {copiedId === 'dockerfile-code' ? 'Kopyalandı!' : 'Kodu Kopyala'}
-                    </button>
-                    <pre className="bg-slate-900 text-slate-300 p-6 rounded-2xl text-sm overflow-x-auto leading-relaxed border-b-4 border-slate-700">
-{dockerfileContent}
-                    </pre>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200">
-                    <h4 className="font-bold text-slate-800 mb-2">⚠️ Bunları Kontrol Edin:</h4>
-                    <ul className="text-xs text-slate-600 space-y-2 list-disc pl-4">
-                      <li>Dosya adının sonunda <code>.txt</code> veya <code>.docker</code> olmadığından emin olun. Sadece <b>Dockerfile</b>.</li>
-                      <li>Kopyalarken terminaldeki <code>>>></code> veya satır numaralarını dahil etmeyin.</li>
-                      <li>Dosyanın en başında hiçbir boşluk veya gizli karakter olmamalı.</li>
-                    </ul>
-                  </div>
-                  <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200">
-                    <h4 className="font-bold text-slate-800 mb-2">⚙️ Render Paneli:</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      Render'da Settings sekmesine gidin. <br/>
-                      <b>Docker Command</b> kutusu tamamen <b>BOŞ</b> olmalıdır. 
-                      Eğer orada bir şey yazıyorsa, Render hata verip durur.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-slate-900 p-6 text-center">
-                <p className="text-blue-400 font-bold text-sm underline decoration-blue-500/30">
-                  GitHub'da dosyayı güncelledikten sonra Render'da "Manual Deploy > Clear Cache & Deploy" butonuna basın. ✅
-                </p>
+          <div className="flex justify-center md:border-x md:border-slate-900 py-4">
+            <div className="text-center">
+              <div className="text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Core Status</div>
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></span>
+                <span className="text-sm font-bold text-slate-300">Cluster Diagnostic Link Established</span>
               </div>
             </div>
           </div>
-        )}
 
-        {activeTab === TabType.Guide && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <section className="mb-10 text-center sm:text-left">
-              <h2 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">Hugging Face n8n Kurulumu</h2>
-              <p className="text-lg text-slate-600 max-w-2xl leading-relaxed">
-                Hugging Face üzerinde 16GB RAM ile profesyonel n8n kurulumu için rehberi takip edin.
-              </p>
-            </section>
-            {STEPS.map(step => (
-              <StepCard key={step.id} step={step} />
-            ))}
+          <div className="flex flex-col items-end gap-2 text-right">
+             <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Built with precision</div>
+             <p className="text-xs text-slate-600 font-medium">
+               &copy; 2025 DockerConfig AI. Platform Engineering Assistant.
+             </p>
           </div>
-        )}
-
-        {activeTab === TabType.Workflows && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
-            {WORKFLOWS.map((workflow, idx) => (
-              <div key={idx} className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm p-8">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-2xl font-black text-slate-800 tracking-tight">{workflow.name}</h3>
-                  <button 
-                    onClick={() => copyToClipboard(workflow.json, `wf-${idx}`)} 
-                    className="bg-slate-900 text-white px-6 py-2 rounded-xl text-sm font-bold active:scale-95 transition-transform"
-                  >
-                    {copiedId === `wf-${idx}` ? 'Kopyalandı!' : 'JSON Kopyala'}
-                  </button>
-                </div>
-                <p className="text-slate-600 text-sm leading-relaxed">{workflow.description}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {activeTab === TabType.AIAssistant && <AIAssistant />}
-      </main>
+        </div>
+      </footer>
     </div>
   );
 };

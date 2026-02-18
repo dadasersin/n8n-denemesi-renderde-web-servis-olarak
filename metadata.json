@@ -1,5 +1,5 @@
 {
-  "name": "n8n Hugging Face Deployer",
-  "description": "A comprehensive guide and resource tool for deploying n8n on Hugging Face Spaces with 16GB RAM and persistent storage advice.",
+  "name": "DockerConfig AI",
+  "description": "An intelligent assistant for debugging Docker deployment errors and generating optimized Dockerfile/docker-compose configurations for n8n and other web applications.",
   "requestFramePermissions": []
 }
