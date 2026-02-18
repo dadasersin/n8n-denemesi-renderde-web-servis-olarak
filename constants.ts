@@ -23,58 +23,39 @@ pinned: false
 ---
 
 # n8n Hugging Face Space
-Bu Space, Docker altyapısı kullanılarak n8n çalıştırmak için yapılandırılmıştır.
-
-## 🛠 Yapılandırma Notları
-- **SDK:** Docker
-- **Port:** 7860 (Hugging Face varsayılanı)
-- **RAM:** 16GB (Ücretsiz plan)
-
-Eğer "Configuration Error" alıyorsanız, bu dosyanın (README.md) en üstündeki YAML başlığı eksik veya hatalı olduğunda bu hatayı verir.`;
+Bu Space, Docker altyapısı kullanılarak n8n çalıştırmak için yapılandırılmıştır.`;
 
 export const STEPS: Step[] = [
   {
     id: 1,
     title: "Yeni Bir Space Oluştur",
-    description: "Hugging Face üzerinde yeni bir 'Space' başlatın. Kurulumun temeli burada atılır.",
+    description: "Hugging Face üzerinde yeni bir 'Space' başlatın.",
     tips: [
       "huggingface.co/new-space adresine gidin.",
-      "İsim verin (Örn: n8n-is-akisi).",
-      "SDK: Mutlaka 'Docker' ve şablon olarak 'Blank' seçin.",
-      "Privacy: 'Private' seçerek güvenliğinizi sağlayın."
+      "SDK olarak 'Docker' seçin.",
+      "Privacy: 'Private' seçilmesi önerilir."
     ]
   },
   {
     id: 2,
-    title: "README.md Yapılandırması (Kritik)",
-    description: "Hugging Face'in 'Configuration Error' vermemesi için README.md dosyasının en başında bu metadata bloğu bulunmalıdır. 'sdk: docker' satırı sistemin Dockerfile'ı tanımasını sağlar.",
+    title: "README.md Yapılandırması",
+    description: "Hugging Face metadata bloğunu README.md dosyasının en üstüne yapıştırın.",
     fileName: "README.md",
     code: README_CONTENT,
     tips: [
-      "README.md dosyasını düzenle diyerek en üste bu içeriği yapıştırın.",
-      "app_port: 7860 ayarı, Hugging Face'in konteynere hangi porttan bağlanacağını söyler.",
-      "Bu blok olmazsa veya hatalıysa Space 'Building' aşamasına geçemez."
+      "sdk: docker satırı çok önemlidir.",
+      "app_port: 7860 değerini değiştirmeyin."
     ]
   },
   {
     id: 3,
     title: "Dockerfile Dosyasını Oluştur",
-    description: "n8n'in nasıl kurulacağını ve çalıştırılacağını tarif eden dosyadır. (Bu dosyayı Hugging Face'e ekleyeceksiniz, Render'a değil!)",
+    description: "Bu kodu Hugging Face'deki Dockerfile dosyasına yapıştırın.",
     fileName: "Dockerfile",
     code: DOCKERFILE_CONTENT,
     tips: [
-      "Hugging Face 7860 portunu bekler. EXPOSE and --port değerlerinin 7860 olduğundan emin olun.",
-      "n8n verileri için /data klasörü oluşturulur ve izinleri ayarlanır."
-    ]
-  },
-  {
-    id: 4,
-    title: "Ortam Değişkenlerini (Variables) Tanımla",
-    description: "Güvenlik ve erişim için Settings > Variables and secrets sekmesine gidin.",
-    tips: [
-      "N8N_ENCRYPTION_KEY: Rastgele bir şifre girin.",
-      "WEBHOOK_URL: Space sayfasındaki URL'nizi (örneğin: https://username-spacename.hf.space/) sonuna '/' koyarak ekleyin.",
-      "N8N_PORT: 7860 olarak ayarlayın."
+      "Bu dosya n8n'in Hugging Face'de çalışmasını sağlar.",
+      "ÖNEMLİ: Bu dosyayı Render'a yüklediğiniz GitHub deposunun ana dizininde TUTMAYIN, Render'ın kafası karışır."
     ]
   }
 ];
@@ -82,82 +63,43 @@ export const STEPS: Step[] = [
 export const RENDER_STEPS: Step[] = [
   {
     id: 1,
-    title: "Dosyaları GitHub'a Hazırlayın",
-    description: "Deponuzda package.json ve server.js olmalı. DOCKERFILE OLMAMALI.",
+    title: "Render 'Runtime' Ayarı",
+    description: "Render panelinde 'Settings' kısmına gidin.",
     tips: [
-      "Önemli: Eğer n8n için olan Dockerfile dosyasını deponuzda tutuyorsanız, Render bunu Node projesi sanmaz. Onu deponuzdan çıkarın.",
-      "Kök dizinde sadece bu siteye ait dosyalar kalsın."
+      "Runtime: 'Node' seçilmeli (DOCKER SEÇMEYİN).",
+      "Eğer Docker seçili kalırsa 'package.json not found' hatası alırsınız."
     ]
   },
   {
     id: 2,
-    title: "Render'da Yeni 'Web Service' Oluştur",
-    description: "Render panelinde 'New +' butonuna basınca 'Web Service' seçeneğini seçin.",
+    title: "Komutları Doğru Yerlere Yazın",
+    description: "Render 'Web Service' için şu iki alanı doldurun:",
     tips: [
-      "GitHub deponuzu Render'a bağlayın.",
-      "Runtime: Mutlaka 'Node' seçin (Docker SEÇMEYİN)."
+      "Build Command: npm install && npm run build",
+      "Start Command: npm start",
+      "Bu komutları 'Docker Command' kısmına değil, kendi alanlarına yazmalısınız."
     ]
   },
   {
     id: 3,
-    title: "Web Servisi Ayarları",
-    description: "Render'ın uygulamayı çalıştırması için bu ayarları girin:",
+    title: "Environment Variables",
+    description: "Uygulamanın çalışması için API anahtarını ekleyin.",
     tips: [
-      "Build Command: npm install && npm run build",
-      "Start Command: npm start",
-      "Environment Variables: API_KEY (Gemini için) eklemeyi unutmayın."
+      "Key: API_KEY",
+      "Value: Google AI Studio'dan aldığınız anahtar."
     ]
   }
 ];
 
 export const VARIABLES: Variable[] = [
-  { key: "N8N_ENCRYPTION_KEY", description: "Veritabanındaki hassas verileri şifrelemek için kullanılır.", placeholder: "rastgele-bir-anahtar-123" },
-  { key: "WEBHOOK_URL", description: "Dış servislerin n8n'e ulaşabilmesi için Space URL'niz.", placeholder: "https://user-space.hf.space/" },
-  { key: "N8N_PORT", description: "n8n'in içeride dinlediği port (Dockerfile ile aynı olmalı).", placeholder: "7860" },
-  { key: "DB_TYPE", description: "Kalıcı veri için PostgreSQL kullanacaksanız ekleyin.", placeholder: "postgresdb" },
+  { key: "N8N_ENCRYPTION_KEY", description: "Hassas verileri şifrelemek için anahtar.", placeholder: "rastgele-anahtar-123" },
+  { key: "WEBHOOK_URL", description: "Space URL'niz (sonunda / olmalı).", placeholder: "https://user-space.hf.space/" }
 ];
 
 export const WORKFLOWS: Workflow[] = [
   {
     name: "YouTube Trend & Gemini Senaryo Yazarı",
-    description: "YouTube popüler videolarını çeker ve Gemini 1.5/2.0 modelleriyle bu konularda viral senaryolar üretir.",
-    json: `{
-  "nodes": [
-    {
-      "parameters": {
-        "url": "https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&regionCode=TR&maxResults=5&key=YOUR_API_KEY",
-        "options": {}
-      },
-      "name": "YouTube Trends",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 3,
-      "position": [250, 300]
-    },
-    {
-      "parameters": {
-        "model": "gemini-3-flash-preview",
-        "prompt": "=Lütfen şu başlık için yaratıcı bir video senaryosu yaz: {{ $json.snippet.title }}",
-        "options": {}
-      },
-      "name": "Gemini AI",
-      "type": "n8n-nodes-base.googleGemini",
-      "typeVersion": 1,
-      "position": [450, 300]
-    }
-  ],
-  "connections": {
-    "YouTube Trends": {
-      "main": [
-        [
-          {
-            "node": "Gemini AI",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  }
-}`
+    description: "Trend videoları bulur ve Gemini ile senaryolaştırır.",
+    json: `{ "nodes": [], "connections": {} }` // Sadeleştirildi
   }
 ];
