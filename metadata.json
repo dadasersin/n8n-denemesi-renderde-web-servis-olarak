@@ -1,5 +1,5 @@
 {
-  "name": "DockerConfig AI",
-  "description": "An intelligent assistant for debugging Docker deployment errors and generating optimized Dockerfile/docker-compose configurations for n8n and other web applications.",
+  "name": "n8n Render Troubleshooter",
+  "description": "A diagnostic dashboard for debugging n8n deployment issues on Render, specifically addressing 'Lost Connection' and 'Server Crash' errors using Gemini AI.",
   "requestFramePermissions": []
 }
