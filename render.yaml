@@ -15,3 +15,16 @@ services:
         fromContext: instanceUrl
       - key: N8N_ENCRYPTION_KEY
         generateValue: true
+      # PostgreSQL (Supabase) Settings - Add these in Render Dashboard for stability
+      - key: DB_TYPE
+        value: postgresdb
+      - key: DB_POSTGRESDB_PORT
+        value: 5432
+      - key: DB_POSTGRESDB_HOST
+        placeholder: "db.xxxx.supabase.co"
+      - key: DB_POSTGRESDB_DATABASE
+        value: postgres
+      - key: DB_POSTGRESDB_USER
+        value: postgres
+      - key: DB_POSTGRESDB_PASSWORD
+        placeholder: "Your Supabase DB Password"

@@ -34,3 +34,19 @@ Depodaki `render.yaml` dosyasını kullanarak tüm bu ayarların otomatik yapıl
 
 **Hata Nerede?**
 Eğer hala sorun yaşıyorsanız, loglarınızı kopyalayıp bu uygulamanın ana sayfasındaki analiz kutusuna yapıştırın. Gemini size tam olarak hangi satırda ne hatası olduğunu Türkçe olarak açıklayacaktır.
+
+## 💎 Kesin Çözüm: Supabase (PostgreSQL) Kullanımı
+Render'ın ücretsiz planında SQLite (n8n'in varsayılanı) kullanmak "Sunucuyla bağlantı kesildi" hatasının en yaygın sebebidir. SQLite dosya kilitlenmeleri n8n'i dondurur.
+
+**Çözüm:** Supabase'den ücretsiz bir PostgreSQL veritabanı açın ve şu değişkenleri Render panelinde tanımlayın:
+
+| Key | Value |
+| :--- | :--- |
+| `DB_TYPE` | `postgresdb` |
+| `DB_POSTGRESDB_HOST` | Supabase Host (örn: db.xyz.supabase.co) |
+| `DB_POSTGRESDB_PORT` | `5432` |
+| `DB_POSTGRESDB_DATABASE` | `postgres` |
+| `DB_POSTGRESDB_USER` | `postgres` |
+| `DB_POSTGRESDB_PASSWORD` | Supabase Şifreniz |
+
+Bu ayarlar yapıldığında n8n verilerini harici bir veritabanında saklar, SQLite kilitlenmeleri yaşanmaz ve bağlantı kopma sorunu kalıcı olarak çözülür.

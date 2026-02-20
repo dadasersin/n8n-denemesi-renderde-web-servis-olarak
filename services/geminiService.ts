@@ -46,7 +46,7 @@ export const analyzeN8nLogs = async (logs: string): Promise<AnalysisResult> => {
   const prompt = `Aşağıdaki Render loglarını analiz et. Kullanıcı n8n servisinde "Sunucuyla bağlantı kesildi" veya çökme sorunları yaşıyor.
     Logları incelerken şunlara odaklan:
     1. Bellek yetersizliği (OOM/SIGKILL).
-    2. SQLite veritabanı kilitlenmeleri (database is locked).
+    2. SQLite veritabanı kilitlenmeleri (database is locked). -> BU DURUMDA MUTLAKA SUPABASE/POSTGRESQL ÖNER.
     3. Port bağlama hataları (EADDRINUSE veya yanlış port).
     4. Render ücretsiz plan kısıtlamaları.
 
