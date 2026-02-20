@@ -44,11 +44,12 @@ export const analyzeN8nLogs = async (logs: string): Promise<AnalysisResult> => {
   });
 
   const prompt = `Aşağıdaki Render loglarını analiz et. Kullanıcı n8n servisinde "Sunucuyla bağlantı kesildi" veya çökme sorunları yaşıyor.
-    Logları incelerken şunlara odaklan:
+    Logları veya kullanıcı sorularını incelerken şunlara odaklan:
     1. Bellek yetersizliği (OOM/SIGKILL).
     2. SQLite veritabanı kilitlenmeleri (database is locked). -> BU DURUMDA MUTLAKA SUPABASE/POSTGRESQL ÖNER.
     3. Port bağlama hataları (EADDRINUSE veya yanlış port).
     4. Render ücretsiz plan kısıtlamaları.
+    5. n8n AI Chat (/home/chat) özelliğinin kurulumu ve RAM gereksinimleri.
 
     LÜTFEN TÜRKÇE YANIT VER.
 

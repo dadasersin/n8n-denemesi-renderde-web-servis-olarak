@@ -50,3 +50,11 @@ Render'ın ücretsiz planında SQLite (n8n'in varsayılanı) kullanmak "Sunucuyl
 | `DB_POSTGRESDB_PASSWORD` | Supabase Şifreniz |
 
 Bu ayarlar yapıldığında n8n verilerini harici bir veritabanında saklar, SQLite kilitlenmeleri yaşanmaz ve bağlantı kopma sorunu kalıcı olarak çözülür.
+
+## 🤖 n8n'de Yapay Zeka (AI Chat) Kullanımı
+Render üzerindeki n8n'inizde `/home/chat` (AI Chat) özelliğini kullanmak için:
+
+1. **Bellek Yönetimi:** AI düğümleri RAM tüketir. Mutlaka **Supabase (PostgreSQL)** kullanın (SQLite ile AI sistemi çöker).
+2. **Kimlik Bilgileri:** n8n içinde "Credentials" kısmına gidip "Google Gemini API" seçeneğini ekleyin.
+3. **Workflow:** "Chat Trigger" -> "AI Agent" -> "Gemini Chat Model" düğümlerini birbirine bağlayın.
+4. **Port Sabitleme:** Render üzerinde `N8N_PORT=10000` değişkeninin tanımlı olduğundan emin olun, aksi takdirde AI arayüzü yüklenmez.
