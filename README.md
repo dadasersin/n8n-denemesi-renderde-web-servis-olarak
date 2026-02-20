@@ -1,20 +1,34 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# n8n Render Troubleshooter & Optimized Deployment
 
-# Run and deploy your AI Studio app
+Bu proje, n8n'in Render.com üzerinde yaşadığı **"Sunucuyla bağlantı kesildi"** hatalarını çözmek için tasarlanmıştır.
 
-This contains everything you need to run your app locally.
+## 🚀 Hata Nerede? (Neden Bağlantı Kopuyor?)
 
-View your app in AI Studio: https://ai.studio/apps/drive/1o5eY-uMdfWtvnsautJ29Zb3ekjZRKHP8
+n8n kurulumunuzda bu hatayı almanızın **3 temel sebebi** vardır:
 
-## Run Locally
+1.  **PORT Ayarı:** n8n'e Render'ın portunu (`$PORT`) kullanması gerektiğini söylemelisiniz. (Çözüm: `N8N_PORT=10000`)
+2.  **RAM Sınırı:** Ücretsiz plandaki 512MB RAM n8n için yetersiz kalabilir. (Çözüm: Starter plana geçmek veya iş akışlarını parçalamak.)
+3.  **SQLite Kilidi:** Dosya yazma hataları sistemi dondurabilir. (Çözüm: `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false`)
 
-**Prerequisites:**  Node.js
+Detaylı teknik rehber için: **[RENDER_GUIDE.md](./RENDER_GUIDE.md)**
 
+---
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🛠️ Bu Uygulama Nasıl Kullanılır?
+
+Bu depo aslında bir **Teşhis Aracıdır**. Render'daki loglarınızı bu uygulamaya yapıştırarak hatanın tam yerini bulabilirsiniz.
+
+1.  Uygulamayı Render'da bir "Web Service" olarak başlatın.
+2.  `GEMINI_API_KEY` değişkenini tanımlayın.
+3.  Loglarınızı asistan kutusuna yapıştırın.
+
+---
+
+## 🏗️ n8n'i Doğru Kurmak İçin
+
+Eğer n8n'i en baştan hatasız kurmak istiyorsanız, bu depodaki `render.yaml` ve `Dockerfile.n8n` dosyalarını kullanabilirsiniz.
+
+### n8n İçin Gerekli Environment Variables:
+- `N8N_PORT`: `10000`
+- `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS`: `false`
+- `WEBHOOK_URL`: `https://[app-adiniz].onrender.com/`

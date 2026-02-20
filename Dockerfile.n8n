@@ -1,0 +1,10 @@
+FROM n8nio/n8n:latest
+
+USER root
+RUN mkdir -p /data/.n8n && chmod -R 777 /data
+ENV N8N_USER_ID=1000
+ENV N8N_DATA_FOLDER=/data/.n8n
+
+# Render default port
+EXPOSE 10000
+CMD ["n8n", "start", "--port=10000"]

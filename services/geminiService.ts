@@ -2,9 +2,13 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult } from "../types";
 
 export const analyzeN8nLogs = async (logs: string): Promise<AnalysisResult> => {
-  const apiKey = (window as any).process?.env?.API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+  // Try to get API Key from various sources
+  const apiKey = (window as any).process?.env?.API_KEY ||
+                 (window as any).process?.env?.GEMINI_API_KEY ||
+                 (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+
   if (!apiKey) {
-    throw new Error("Gemini API Key is missing. Please set it in the environment variables.");
+    throw new Error("Gemini API Anahtarı bulunamadı. Lütfen Render ortam değişkenlerinde GEMINI_API_KEY tanımlayın.");
   }
 
   const genAI = new GoogleGenAI(apiKey);
@@ -39,26 +43,28 @@ export const analyzeN8nLogs = async (logs: string): Promise<AnalysisResult> => {
     }
   });
 
-  const prompt = `Analyze the following Render logs for an n8n deployment. The user is experiencing "Lost connection to the server" or deployment crashes.
-    Look for:
-    1. Out of Memory (OOM) kills.
-    2. SQLite database locking issues (database is locked).
-    3. WebSocket or SSE connection timeouts.
-    4. Port binding errors.
-    5. Disk space issues.
-    6. Missing package.json (ENOENT) errors during startup (often caused by incorrect Start Command like 'npm start' instead of 'n8n start' or leaving it blank).
+  const prompt = `Aşağıdaki Render loglarını analiz et. Kullanıcı n8n servisinde "Sunucuyla bağlantı kesildi" veya çökme sorunları yaşıyor.
+    Logları incelerken şunlara odaklan:
+    1. Bellek yetersizliği (OOM/SIGKILL).
+    2. SQLite veritabanı kilitlenmeleri (database is locked).
+    3. Port bağlama hataları (EADDRINUSE veya yanlış port).
+    4. Render ücretsiz plan kısıtlamaları.
 
-    Logs:
+    LÜTFEN TÜRKÇE YANIT VER.
+
+    Loglar:
     ${logs}
     `;
 
-  const result = await model.generateContent(prompt);
-  const responseText = result.response.text();
-
   try {
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
     return JSON.parse(responseText) as AnalysisResult;
-  } catch (e) {
-    console.error("Failed to parse analysis result from Gemini:", responseText);
-    throw new Error("Failed to parse analysis result from Gemini");
+  } catch (e: any) {
+    console.error("Gemini Analysis Error:", e);
+    if (e.message?.includes("API_KEY_INVALID")) {
+      throw new Error("Geçersiz API Anahtarı. Lütfen GEMINI_API_KEY değerini kontrol edin.");
+    }
+    throw new Error("Analiz başarısız oldu: " + (e.message || "Bilinmeyen AI hatası"));
   }
 };

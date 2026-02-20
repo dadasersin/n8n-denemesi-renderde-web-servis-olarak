@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: n8n-optimized
+    env: docker
+    plan: free
+    region: frankfurt
+    dockerContext: .
+    dockerfilePath: Dockerfile.n8n
+    envVars:
+      - key: N8N_PORT
+        value: 10000
+      - key: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+        value: "false"
+      - key: WEBHOOK_URL
+        fromContext: instanceUrl
+      - key: N8N_ENCRYPTION_KEY
+        generateValue: true

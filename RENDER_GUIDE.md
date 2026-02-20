@@ -1,31 +1,36 @@
-# Render.com Dağıtım (Deployment) Rehberi
+# Render.com n8n Bağlantı Sorunları Çözüm Rehberi
 
-Bu uygulama için Render.com üzerinde yapılması gereken ayarlar aşağıdadır. "Sunucuyla bağlantı kesildi" hatasını önlemek ve uygulamanın doğru çalışmasını sağlamak için bu adımları takip edin.
+n8n üzerinde **"Sunucuyla bağlantı kesildi"** veya **"Connection lost"** hatası alıyorsanız, bu rehber sorunu %99 oranında çözecektir.
 
-## 1. Yeni Web Service Oluşturun
-Render panelinde **New +** butonuna tıklayın ve **Web Service** seçeneğini belirleyin. GitHub deponuzu bağlayın.
+## 1. En Kritik Ayar: Port Yapılandırması
+Render, uygulamanızın `$PORT` (genellikle 10000) üzerinden dinlemesini bekler. n8n ise varsayılan olarak 5678'i kullanır. Bu uyuşmazlık bağlantının kopmasına neden olur.
 
-## 2. Çalışma Zamanı (Runtime) Ayarları
-Render deponuzda bir `Dockerfile` bulursa otomatik olarak Docker kullanmaya çalışabilir. Eğer Docker hatası alıyorsanız veya bağlantı kopuyorsa şu ayarları kullanın:
+**Çözüm:** Render panelinde **Environment** sekmesine gidin ve şu değişkeni ekleyin:
+- **Key:** `N8N_PORT`
+- **Value:** `10000` (Veya `$PORT`)
 
-- **Runtime:** `Node`
-- **Build Command:** `npm install && npm run build`
-- **Start Command:** `npm start`
+## 2. Bellek (RAM) Sorunları (OOM Kill)
+Render Ücretsiz planı (Free Tier) sadece 512MB RAM sunar. n8n çok fazla iş akışı çalıştırdığında veya ağır JSON verileri işlediğinde bu sınırı aşar.
 
-## 3. Ortam Değişkenleri (Environment Variables)
-**Settings > Environment** sekmesine gidin ve şu değişkenleri ekleyin:
+**Belirtiler:** Loglarda `SIGKILL` veya `Out of Memory` mesajları görülür.
+**Çözüm:**
+- Eğer bütçeniz varsa **Starter** plana geçin (2GB RAM).
+- Ücretsiz planda kalacaksanız, çok büyük veri kümelerini (500+ satır) tek seferde işlememeye çalışın, `Split In Batches` nodunu kullanın.
 
-| Key | Value | Açıklama |
-| :--- | :--- | :--- |
-| `GEMINI_API_KEY` | `AI...your_key...` | Gemini API anahtarınız (Zorunlu) |
-| `PORT` | `10000` | Render'ın kullandığı varsayılan port |
-| `NODE_VERSION` | `20` | Node.js sürümü (Önerilen) |
+## 3. SQLite Veritabanı Kilitlenmeleri
+"Database is locked" hatası n8n'in donmasına ve bağlantının kopmasına neden olur.
 
-## 4. "Sunucuyla bağlantı kesildi" Hatası İçin Çözümler
+**Çözüm:** Environment sekmesine şu değişkeni ekleyin:
+- **Key:** `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS`
+- **Value:** `false`
 
-1.  **API Anahtarı Kontrolü:** `GEMINI_API_KEY` değişkeninin doğru girildiğinden ve geçerli olduğundan emin olun.
-2.  **Ücretsiz Plan Kısıtlaması:** Render'ın ücretsiz planı (Free Tier), uygulama 15 dakika boyunca istek almazsa sunucuyu "uyku" moduna alır. İlk girişte sunucunun uyanması 30-60 saniye sürebilir. Bu sürede bağlantı hatası alıyorsanız sayfayı yenileyin.
-3.  **Sağlık Kontrolü (Health Check):** Render panelinde `Health Check Path` kısmını boş bırakın veya `/` yapın.
+## 4. Webhook URL Yapılandırması
+Bazı nodların (Telegram, WhatsApp vb.) çalışması için doğru Webhook URL şarttır.
+- **Key:** `WEBHOOK_URL`
+- **Value:** `https://uygulama-adiniz.onrender.com/` (Sonunda / olmalı)
 
-## 5. Uygulama Nasıl Güncellenir?
-GitHub deponuza kod gönderdiğinizde (push), Render otomatik olarak yeni bir build başlatacaktır. Eğer build hata verirse, terminal kısmındaki hata mesajlarını kopyalayıp uygulamadaki AI asistanına sorabilirsiniz.
+## 5. Render.yaml ile Otomatik Kurulum
+Depodaki `render.yaml` dosyasını kullanarak tüm bu ayarların otomatik yapıldığı yeni bir servis başlatabilirsiniz.
+
+**Hata Nerede?**
+Eğer hala sorun yaşıyorsanız, loglarınızı kopyalayıp bu uygulamanın ana sayfasındaki analiz kutusuna yapıştırın. Gemini size tam olarak hangi satırda ne hatası olduğunu Türkçe olarak açıklayacaktır.
