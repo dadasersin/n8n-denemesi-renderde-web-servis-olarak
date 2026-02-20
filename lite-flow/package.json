@@ -1,0 +1,21 @@
+{
+  "name": "lite-flow",
+  "version": "1.0.0",
+  "description": "Ultra-lightweight automation engine for low-resource environments",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "tsx": "^4.0.0",
+    "@types/node": "^20.8.0"
+  }
+}

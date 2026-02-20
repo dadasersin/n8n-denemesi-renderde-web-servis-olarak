@@ -13,7 +13,7 @@ export const analyzeN8nLogs = async (logs: string): Promise<AnalysisResult> => {
 
   const genAI = new GoogleGenAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: 'gemini-3-flash',
+    model: 'gemini-1.5-flash',
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
