@@ -1,2 +1,20 @@
-FROM n8nio/n8n:latest
-COPY . /home/node/.n8n
+# Build stage
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server.js ./
+COPY --from=builder /app/package*.json ./
+RUN npm install --only=production
+
+ENV PORT=10000
+EXPOSE 10000
+
+CMD ["node", "server.js"]

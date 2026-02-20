@@ -1,19 +1,16 @@
-
 export interface AnalysisResult {
-  explanation: string;
-  solution: string;
-  files: GeneratedFile[];
+  diagnosis: string;
+  probableCauses: string[];
+  suggestedFixes: {
+    title: string;
+    description: string;
+    code?: string;
+  }[];
 }
 
-export interface GeneratedFile {
-  name: string;
-  language: string;
-  content: string;
-}
-
-export enum Status {
+export enum DiagnosticStatus {
   IDLE = 'IDLE',
-  LOADING = 'LOADING',
+  ANALYZING = 'ANALYZING',
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR'
 }

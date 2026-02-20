@@ -1,284 +1,173 @@
-
-import React, { useState, useEffect } from 'react';
-import { analyzeDockerError } from './services/geminiService';
-import { AnalysisResult, Status } from './types';
-import { CodeBlock } from './components/CodeBlock';
+import React, { useState } from 'react';
+import { analyzeN8nLogs } from './services/geminiService';
+import { AnalysisResult, DiagnosticStatus } from './types';
 
 const App: React.FC = () => {
-  const [errorInput, setErrorInput] = useState<string>(
-    `==> Cloning from https://github.com/dadasersin/n8n-denemesi
-Menu
-==> Checking out commit 4b1635e03395a700883ba1509a052899d3c80baa in branch main
-#1 [internal] load build definition from Dockerfile
-#1 transferring dockerfile: 2B done
-#1 DONE 0.0s
-error: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory`
-  );
-  const [contextInput, setContextInput] = useState<string>('Cloud platform (Render/Railway) deployment for n8n-denemesi');
-  const [status, setStatus] = useState<Status>(Status.IDLE);
+  const [logs, setLogs] = useState('');
+  const [status, setStatus] = useState<DiagnosticStatus>(DiagnosticStatus.IDLE);
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAnalyze = async () => {
-    if (!errorInput.trim()) return;
+    if (!logs.trim()) return;
 
-    setStatus(Status.LOADING);
-    setResult(null);
-    setErrorMessage(null);
+    setStatus(DiagnosticStatus.ANALYZING);
+    setError(null);
+
     try {
-      const data = await analyzeDockerError(errorInput, contextInput);
-      setResult(data);
-      setStatus(Status.SUCCESS);
+      const diagnosis = await analyzeN8nLogs(logs);
+      setResult(diagnosis);
+      setStatus(DiagnosticStatus.SUCCESS);
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(err.message || 'Analysis failed. Check your API key or logs.');
-      setStatus(Status.ERROR);
+      setError("An error occurred during analysis. Check if your API key is valid or if the logs are readable.");
+      setStatus(DiagnosticStatus.ERROR);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-indigo-500/30 font-sans">
-      {/* Navigation */}
-      <nav className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight text-white leading-tight">DockerConfig AI</h1>
-              <p className="text-[10px] uppercase tracking-widest text-indigo-400 font-black">Cloud Build Engine</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Analysis Engine: Gemini 3 Flash
-            </div>
-          </div>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      {/* Header */}
+      <header className="bg-indigo-700 text-white py-8 px-4 shadow-lg">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold flex items-center gap-2 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            n8n Render Troubleshooter
+          </h1>
+          <p className="mt-2 opacity-90 text-lg">Fix "Lost connection to the server" and deployment crashes using AI-powered log analysis.</p>
         </div>
-      </nav>
+      </header>
 
-      <main className="max-w-[1400px] mx-auto p-6 lg:p-10">
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-          
-          {/* Left Column: Build Logs */}
-          <div className="xl:col-span-5 space-y-8">
-            <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                <svg className="w-32 h-32 text-indigo-500" fill="currentColor" viewBox="0 0 24 24"><path d="M13.983 11l2.357-2.357-1.414-1.414L12.569 9.57 10.212 7.213 8.798 8.627 11.155 10.984l-2.357 2.357 1.414 1.414 2.357-2.357 2.357 2.357 1.414-1.414L13.983 11z"/></svg>
-              </div>
-
-              <h2 className="text-sm font-bold text-slate-400 mb-8 uppercase tracking-[0.2em] flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
-                Cloud Build Logs
-              </h2>
-
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between items-center mb-2 px-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Terminal Trace</label>
-                    <span className="text-[10px] text-indigo-400/60 font-mono">STDOUT</span>
-                  </div>
-                  <textarea
-                    value={errorInput}
-                    onChange={(e) => setErrorInput(e.target.value)}
-                    placeholder="Paste deployment logs here..."
-                    className="w-full h-72 bg-slate-950/80 border border-slate-800 rounded-2xl p-5 text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/40 transition-all mono text-sm leading-relaxed shadow-inner"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-black text-slate-500 mb-2 uppercase tracking-wider px-1">Environment Context</label>
-                  <input
-                    type="text"
-                    value={contextInput}
-                    onChange={(e) => setContextInput(e.target.value)}
-                    placeholder="e.g. Render Web Service, Github Actions..."
-                    className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-4 text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm shadow-inner"
-                  />
-                </div>
-
-                <button
-                  onClick={handleAnalyze}
-                  disabled={status === Status.LOADING}
-                  className={`w-full py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-4 transition-all transform active:scale-[0.97] group ${
-                    status === Status.LOADING
-                      ? 'bg-slate-800 cursor-not-allowed text-slate-500'
-                      : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_20px_40px_-15px_rgba(79,70,229,0.3)]'
-                  }`}
-                >
-                  {status === Status.LOADING ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span>Analyzing Trace...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                      </svg>
-                      <span>Diagnose & Patch</span>
-                    </>
-                  )}
-                </button>
-              </div>
+      <main className="max-w-4xl mx-auto p-4 md:p-8 space-y-8">
+        {/* Quick Tips Section */}
+        <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 className="text-xl font-semibold mb-4 text-indigo-900">Why does n8n crash on Render?</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h3 className="font-bold text-blue-800 flex items-center gap-2">
+                <span className="bg-blue-200 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-sm">1</span>
+                Memory (RAM)
+              </h3>
+              <p className="text-sm text-blue-700 mt-1">Render's Free plan has 512MB. n8n with many nodes or heavy processing easily hits this and gets OOM killed (SIGKILL).</p>
             </div>
-
-            <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-amber-500/20 rounded-lg text-amber-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-xs font-black uppercase tracking-widest text-amber-400">Diagnosis Focus</span>
-              </div>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                The current error indicates that the repository was cloned successfully, but the builder failed at the very first step: loading the <code className="text-indigo-400 font-mono">Dockerfile</code>. This is almost always a pathing or filename issue.
-              </p>
+            <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+              <h3 className="font-bold text-amber-800 flex items-center gap-2">
+                <span className="bg-amber-200 text-amber-800 rounded-full w-6 h-6 flex items-center justify-center text-sm">2</span>
+                SQLite Locking
+              </h3>
+              <p className="text-sm text-amber-700 mt-1">On network drives or when multiple instances run, SQLite often throws "database is locked" errors, crashing the process.</p>
+            </div>
+            <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+              <h3 className="font-bold text-emerald-800 flex items-center gap-2">
+                <span className="bg-emerald-200 text-emerald-800 rounded-full w-6 h-6 flex items-center justify-center text-sm">3</span>
+                Start Command
+              </h3>
+              <p className="text-sm text-emerald-700 mt-1">Errors like "ENOENT: package.json" mean Render is trying to run npm. Clear the Start Command field or set it to "n8n start".</p>
             </div>
           </div>
+        </section>
 
-          {/* Right Column: Diagnostics Result */}
-          <div className="xl:col-span-7">
-            {status === Status.IDLE && (
-              <div className="h-full border-2 border-dashed border-slate-800 rounded-[2.5rem] flex flex-col items-center justify-center p-12 text-center bg-slate-900/10">
-                <div className="w-24 h-24 bg-slate-900/80 rounded-3xl flex items-center justify-center mb-8 shadow-inner border border-slate-800">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-slate-400">Awaiting Build Data</h3>
-                <p className="text-slate-500 mt-3 max-w-sm leading-relaxed">Provide build logs to start the AI-driven troubleshooting session. We support n8n, Node.js, and general Docker errors.</p>
-              </div>
-            )}
-
-            {status === Status.ERROR && (
-              <div className="p-10 bg-red-900/10 border border-red-900/30 rounded-[2.5rem] text-red-400 animate-in slide-in-from-bottom-4 duration-500">
-                <div className="flex items-start gap-5">
-                  <div className="p-3 bg-red-900/20 rounded-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-black text-xl uppercase tracking-wider">Engine Error</h3>
-                    <p className="mt-2 text-slate-400 leading-relaxed">{errorMessage}</p>
-                    <button onClick={handleAnalyze} className="mt-8 px-8 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-600/20">
-                      Re-run Diagnostics
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {status === Status.SUCCESS && result && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-right-10 duration-700">
-                <div className="bg-slate-900/80 border border-slate-800 rounded-[2.5rem] overflow-hidden shadow-2xl backdrop-blur-md">
-                  <div className="p-10 border-b border-slate-800/50">
-                    <div className="flex items-center justify-between mb-10">
-                      <div className="flex items-center gap-3 text-indigo-400 uppercase tracking-[0.3em] text-[10px] font-black">
-                        <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></span>
-                        Incident Analysis
-                      </div>
-                      <div className="text-[10px] font-mono text-slate-600 bg-slate-950 px-4 py-1.5 rounded-full border border-slate-800">
-                        RESOLVED
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                      <div>
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Observation</h3>
-                        <div className="bg-slate-950/40 p-6 rounded-2xl border border-slate-800/50 shadow-inner">
-                          <p className="text-slate-300 leading-relaxed text-sm">
-                            {result.explanation}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Remediation Path</h3>
-                        <div className="bg-indigo-500/5 p-6 rounded-2xl border border-indigo-500/10 shadow-inner">
-                          <div className="prose prose-invert prose-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
-                            {result.solution}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Generated Assets */}
-                  <div className="p-10 bg-slate-950/50">
-                    <div className="flex items-center justify-between mb-8">
-                      <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        Remediation Patch
-                      </h3>
-                      <span className="text-[10px] text-slate-600 font-mono uppercase tracking-widest">Git diff ready</span>
-                    </div>
-                    
-                    <div className="space-y-6">
-                      {result.files.map((file, idx) => (
-                        <div key={idx} className="group relative">
-                          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-blue-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                          <div className="relative">
-                            <CodeBlock 
-                              filename={file.name} 
-                              language={file.language} 
-                              content={file.content} 
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+        {/* Log Input Section */}
+        <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-6">
+            <h2 className="text-xl font-semibold mb-2 text-indigo-900">Paste your Render Logs</h2>
+            <p className="text-slate-500 text-sm mb-4 italic">Paste the text from your Render 'Logs' tab to identify the exact cause.</p>
+            <textarea
+              className="w-full h-48 p-4 bg-slate-900 text-slate-100 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none border-none resize-none"
+              placeholder="Example: [n8n] Error: database is locked..."
+              value={logs}
+              onChange={(e) => setLogs(e.target.value)}
+            />
+            <button
+              onClick={handleAnalyze}
+              disabled={status === DiagnosticStatus.ANALYZING || !logs.trim()}
+              className={`mt-4 w-full py-3 px-6 rounded-lg font-bold text-white transition-all shadow-md ${
+                status === DiagnosticStatus.ANALYZING
+                ? 'bg-slate-400 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-700 active:transform active:scale-[0.99]'
+              }`}
+            >
+              {status === DiagnosticStatus.ANALYZING ? 'Analyzing with Gemini...' : 'Analyze Deployment Logs'}
+            </button>
           </div>
-        </div>
+        </section>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700 font-medium">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Analysis Results */}
+        {status === DiagnosticStatus.SUCCESS && result && (
+          <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6 pb-12">
+            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-6">
+              <h2 className="text-2xl font-bold text-emerald-900 mb-2">Diagnosis</h2>
+              <p className="text-emerald-800 text-lg leading-relaxed">{result.diagnosis}</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h3 className="text-lg font-bold text-slate-800 mb-3 uppercase tracking-wider text-xs">Probable Causes</h3>
+                <ul className="space-y-3">
+                  {result.probableCauses.map((cause, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-slate-600">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-indigo-500 shrink-0"></span>
+                      {cause}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h3 className="text-lg font-bold text-slate-800 mb-3 uppercase tracking-wider text-xs">Recommended Action Plan</h3>
+                <div className="space-y-6">
+                  {result.suggestedFixes.map((fix, idx) => (
+                    <div key={idx} className="border-b border-slate-100 last:border-0 pb-4 last:pb-0">
+                      <h4 className="font-bold text-indigo-900 mb-1">{fix.title}</h4>
+                      <p className="text-sm text-slate-600 mb-3">{fix.description}</p>
+                      {fix.code && (
+                        <div className="relative group">
+                          <pre className="bg-slate-900 text-slate-300 p-3 rounded text-xs font-mono overflow-x-auto">
+                            <code>{fix.code}</code>
+                          </pre>
+                          <button
+                            className="absolute top-2 right-2 text-xs bg-slate-700 text-slate-200 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => {
+                              navigator.clipboard.writeText(fix.code || '');
+                              alert('Copied to clipboard!');
+                            }}
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
-      {/* Footer */}
-      <footer className="mt-24 border-t border-slate-900 bg-slate-950/50 py-16 px-6">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3 opacity-60">
-              <div className="w-8 h-8 bg-slate-800 rounded flex items-center justify-center">
-                 <svg className="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
-              </div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">DevOps Intelligence</span>
-            </div>
-            <p className="text-xs text-slate-600 font-medium max-w-xs leading-relaxed">
-              Automated container orchestration support system. Specialized for n8n deployments on Render and other major cloud providers.
-            </p>
-          </div>
-          
-          <div className="flex justify-center md:border-x md:border-slate-900 py-4">
-            <div className="text-center">
-              <div className="text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Core Status</div>
-              <div className="flex items-center justify-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></span>
-                <span className="text-sm font-bold text-slate-300">Cluster Diagnostic Link Established</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-end gap-2 text-right">
-             <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Built with precision</div>
-             <p className="text-xs text-slate-600 font-medium">
-               &copy; 2025 DockerConfig AI. Platform Engineering Assistant.
-             </p>
-          </div>
+      {/* Footer info */}
+      <footer className="bg-slate-100 py-12 px-4 border-t border-slate-200 text-center text-slate-500 text-sm">
+        <div className="max-w-4xl mx-auto">
+          <p>© 2024 n8n Performance & Reliability Assistant powered by Gemini 3 Flash.</p>
+          <p className="mt-1">For help with Docker, memory limits, and persistent volumes on Render.</p>
         </div>
       </footer>
     </div>
