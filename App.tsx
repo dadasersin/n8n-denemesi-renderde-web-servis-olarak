@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { analyzeN8nLogs } from './services/geminiService';
 import { AnalysisResult } from './types';
+import ApiHealthCheck from "./components/ApiHealthCheck";
 
 enum DiagnosticStatus {
   IDLE,
@@ -173,8 +174,9 @@ const App: React.FC = () => {
               </section>
            </div>
 
-           {/* Right: Quick Facts */}
+           {/* Right: Connection Test & Quick Facts */}
            <div className="lg:col-span-5 space-y-8">
+              <ApiHealthCheck />
               <section className="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8">
                 <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Hızlı Bilgiler</h3>
                 <div className="space-y-6">
